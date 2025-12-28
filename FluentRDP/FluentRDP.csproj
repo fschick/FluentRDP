@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<Platforms>AnyCPU</Platforms>
+		<ApplicationIcon>FluentRDP.ico</ApplicationIcon>
+		<ApplicationManifest>FluentRDP.manifest</ApplicationManifest>
+		<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="FluentRDP.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Mono.Options" Version="6.12.0.148" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="AxMSTSCLib">
+			<HintPath>Platform\AxMSTSCLib.dll</HintPath>
+		</Reference>
+		<Reference Include="MSTSCLib">
+			<HintPath>Platform\MSTSCLib.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

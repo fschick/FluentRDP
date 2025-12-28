@@ -295,3 +295,5 @@ __pycache__/
 *.xsd.cs
 
 # User added stuff
+/FluentRDP/Platform/AxMSTSCLib.dll
+/FluentRDP/Platform/MSTSCLib.dll
