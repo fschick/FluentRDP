@@ -96,7 +96,8 @@ public partial class FormRdpClient : Form
 
     private void LoadAndApplyWindowSettings()
     {
-        var persistedSettings = WindowPersistenceService.Load();
+        var hostname = _appSettings.Connection.Hostname;
+        var persistedSettings = WindowPersistenceService.Load(hostname);
         _appSettings.Window.MergeFrom(persistedSettings);
         this.ApplyWindowSettings(_appSettings.Window);
     }
@@ -119,7 +120,8 @@ public partial class FormRdpClient : Form
 
         var windowSettings = this.GetWindowSettings();
         windowSettings.NoCloseOnDisconnect = _appSettings.Window.NoCloseOnDisconnect;
-        windowSettings.Save();
+        var hostname = _appSettings.Connection.Hostname;
+        windowSettings.Save(hostname);
     }
 
     private void SetZoomLevel(uint zoomPercent)

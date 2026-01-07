@@ -1,5 +1,6 @@
 using FluentRDP.Configuration;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Forms;
@@ -28,29 +29,55 @@ internal static class WindowPersistenceService
     };
 
     /// <summary>
-    /// Loads window settings from AppData JSON file
+    /// Loads window settings from AppData JSON file for a specific hostname
     /// </summary>
-    /// <returns>WindowSettings if file exists and is valid, otherwise null</returns>
-    public static WindowSettings? Load()
+    /// <param name="hostname">The hostname to load settings for. Uses empty string if null or empty.</param>
+    /// <returns>WindowSettings if file exists and contains settings for the hostname, otherwise null</returns>
+    public static WindowSettings? Load(string? hostname)
     {
+        var key = string.IsNullOrEmpty(hostname) ? "" : hostname;
+
         if (!File.Exists(_settingsFilePath))
             return null;
 
         var json = File.ReadAllText(_settingsFilePath);
-        return JsonSerializer.Deserialize<WindowSettings>(json, _jsonOptions);
+        var allSettings = JsonSerializer.Deserialize<Dictionary<string, WindowSettings>>(json, _jsonOptions);
+
+        if (allSettings == null || !allSettings.TryGetValue(key, out var settings))
+            return null;
+
+        return settings;
     }
 
     /// <summary>
-    /// Saves window settings to AppData JSON file
+    /// Saves window settings to AppData JSON file for a specific hostname
     /// </summary>
     /// <param name="settings">The window settings to save</param>
-    public static void Save(this WindowSettings settings)
+    /// <param name="hostname">The hostname to save settings for. Uses empty string if null or empty.</param>
+    public static void Save(this WindowSettings settings, string? hostname)
     {
+        var key = string.IsNullOrEmpty(hostname) ? "" : hostname;
+
         if (!Directory.Exists(_settingsDirectory))
             Directory.CreateDirectory(_settingsDirectory);
 
-        var json = JsonSerializer.Serialize(settings, _jsonOptions);
-        File.WriteAllText(_settingsFilePath, json);
+        Dictionary<string, WindowSettings> allSettings;
+
+        if (File.Exists(_settingsFilePath))
+        {
+            var json = File.ReadAllText(_settingsFilePath);
+            allSettings = JsonSerializer.Deserialize<Dictionary<string, WindowSettings>>(json, _jsonOptions) 
+                ?? new Dictionary<string, WindowSettings>();
+        }
+        else
+        {
+            allSettings = new Dictionary<string, WindowSettings>();
+        }
+
+        allSettings[key] = settings;
+
+        var updatedJson = JsonSerializer.Serialize(allSettings, _jsonOptions);
+        File.WriteAllText(_settingsFilePath, updatedJson);
     }
 
     public static void ApplyWindowSettings(this Form window, WindowSettings windowSettings)
