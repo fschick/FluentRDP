@@ -64,10 +64,6 @@ internal sealed class RdpConnectionService : IDisposable
         if (FullScreen)
             _rdpControl.FullScreen = true;
 
-        // TODO: Review
-        //_rdpClient.AdvancedSettings2.keepAliveInterval = 60000;
-        //_rdpClient.AdvancedSettings9.MaxReconnectAttempts = 20;
-
         _rdpControl.Connect();
     }
 
@@ -163,6 +159,12 @@ internal sealed class RdpConnectionService : IDisposable
 
         if (_connectionSettings.AuthenticationLevel != null && _connectionSettings.AuthenticationLevel != AuthenticationLevel.NoRequirement)
             _rdpClient.AdvancedSettings9.AuthenticationLevel = (uint)_connectionSettings.AuthenticationLevel.Value;
+
+        if (_connectionSettings.KeepAliveInterval != null)
+            _rdpClient.AdvancedSettings2.keepAliveInterval = _connectionSettings.KeepAliveInterval.Value;
+
+        if (_connectionSettings.MaxReconnectAttempts != null)
+            _rdpClient.AdvancedSettings9.MaxReconnectAttempts = _connectionSettings.MaxReconnectAttempts.Value;
         #endregion Connection options
 
         #region Display options

@@ -53,6 +53,18 @@ internal class ConnectionSettings
     /// </summary>
     [RdpFile("authentication level", DefaultValue = "3")]
     public AuthenticationLevel? AuthenticationLevel { get; set; }
+
+    /// <summary>
+    /// Gets or sets the keep-alive interval in milliseconds. Sends keep-alive packets to maintain the connection.
+    /// </summary>
+    [RdpFile("autoreconnect max retries")]
+    public int? KeepAliveInterval { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum number of automatic reconnection attempts when the connection is lost.
+    /// </summary>
+    [RdpFile("autoreconnect max retries", DefaultValue = "20")]
+    public int? MaxReconnectAttempts { get; set; }
     #endregion Connection options
 
     #region Display options

@@ -119,6 +119,10 @@ internal class CommandLineOptions
                 v => settings.Connection.EnableCredSsp = v != null ? true : null },
             { "auth-level|authentication-level=", "Server authentication level: no-warning, no-connect, warn, none (default: none)",
                 v => settings.Connection.AuthenticationLevel = ParseAuthenticationLevel(v) },
+            { "keep-alive-interval=", "Keep-alive interval in milliseconds (default: not set)",
+                (int? v) => settings.Connection.KeepAliveInterval = v },
+            { "max-reconnect-attempts=", "Maximum number of automatic reconnection attempts (default: not set)",
+                (int? v) => settings.Connection.MaxReconnectAttempts = v },
             { "no-auto-connect|edit", "Disable automatic connection when hostname is provided",
                 v => settings.NoAutoConnect = v != null ? true : null },
 
@@ -368,6 +372,8 @@ internal class CommandLineOptions
                                                 no-connect - Don't connect if auth fails (most secure)
                 --enable-credssp, --credssp     Enable CredSSP (Credential Security Support Provider) authentication
                                                 for Kerberos/NTLM SSO support
+                --keep-alive-interval <ms>      Keep-alive interval in milliseconds (sends keep-alive packets to maintain connection)
+                --max-reconnect-attempts <num>  Maximum number of automatic reconnection attempts when connection is lost
 
             Display options:
                 --width <width>                 Desktop width in pixels
