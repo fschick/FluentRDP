@@ -32,6 +32,20 @@ public partial class FormSettings : Form
 
     private void InitializeEnumComboBoxes()
     {
+        cmbKeyboardMode.Items.Add(new ComboBoxItem<KeyboardMode?>(KeyboardMode.OnLocalComputer, "On Local Computer"));
+        cmbKeyboardMode.Items.Add(new ComboBoxItem<KeyboardMode?>(KeyboardMode.OnRemoteComputer, "On Remote Computer"));
+        cmbKeyboardMode.Items.Add(new ComboBoxItem<KeyboardMode?>(KeyboardMode.InFullScreenOnly, "In Full Screen Only"));
+        cmbKeyboardMode.SelectedIndex = 0;
+
+        cmbAudioMode.Items.Add(new ComboBoxItem<AudioPlaybackMode?>(AudioPlaybackMode.PlayOnLocal, "Play on Local"));
+        cmbAudioMode.Items.Add(new ComboBoxItem<AudioPlaybackMode?>(AudioPlaybackMode.PlayOnRemote, "Play on Remote"));
+        cmbAudioMode.Items.Add(new ComboBoxItem<AudioPlaybackMode?>(AudioPlaybackMode.DoNotPlay, "Do Not Play"));
+        cmbAudioMode.SelectedIndex = 0;
+
+        cmbRedirectAudioCapture.Items.Add(new ComboBoxItem<bool?>(false, "Do not record"));
+        cmbRedirectAudioCapture.Items.Add(new ComboBoxItem<bool?>(true, "Record from this computer"));
+        cmbRedirectAudioCapture.SelectedIndex = 0;
+
         cmbScreenMode.Items.Add(new ComboBoxItem<ScreenModeOption>(ScreenModeOption.Windowed, "Windowed"));
         cmbScreenMode.Items.Add(new ComboBoxItem<ScreenModeOption>(ScreenModeOption.FullScreen, "Full Screen"));
         cmbScreenMode.Items.Add(new ComboBoxItem<ScreenModeOption>(ScreenModeOption.UseAllMonitors, "Use All Monitors"));
@@ -67,47 +81,37 @@ public partial class FormSettings : Form
         cmbAuthenticationLevel.Items.Add(new ComboBoxItem<AuthenticationLevel?>(AuthenticationLevel.WarnUser, "Warn User"));
         cmbAuthenticationLevel.Items.Add(new ComboBoxItem<AuthenticationLevel?>(AuthenticationLevel.NoRequirement, "No Requirement"));
         cmbAuthenticationLevel.SelectedIndex = 0;
-
-        cmbKeyboardMode.Items.Add(new ComboBoxItem<KeyboardMode?>(KeyboardMode.OnLocalComputer, "On Local Computer"));
-        cmbKeyboardMode.Items.Add(new ComboBoxItem<KeyboardMode?>(KeyboardMode.OnRemoteComputer, "On Remote Computer"));
-        cmbKeyboardMode.Items.Add(new ComboBoxItem<KeyboardMode?>(KeyboardMode.InFullScreenOnly, "In Full Screen Only"));
-        cmbKeyboardMode.SelectedIndex = 0;
-
-        cmbAudioMode.Items.Add(new ComboBoxItem<AudioPlaybackMode?>(AudioPlaybackMode.PlayOnLocal, "Play on Local"));
-        cmbAudioMode.Items.Add(new ComboBoxItem<AudioPlaybackMode?>(AudioPlaybackMode.PlayOnRemote, "Play on Remote"));
-        cmbAudioMode.Items.Add(new ComboBoxItem<AudioPlaybackMode?>(AudioPlaybackMode.DoNotPlay, "Do Not Play"));
-        cmbAudioMode.SelectedIndex = 0;
-
-        cmbRedirectAudioCapture.Items.Add(new ComboBoxItem<bool?>(false, "Do not record"));
-        cmbRedirectAudioCapture.Items.Add(new ComboBoxItem<bool?>(true, "Record from this computer"));
-        cmbRedirectAudioCapture.SelectedIndex = 0;
     }
 
     private void LoadConnectionSettingsToUi(ConnectionSettings settings)
     {
         txtHostname.Text = settings.Hostname ?? string.Empty;
-        txtDomain.Text = settings.Domain ?? string.Empty;
         txtUsername.Text = settings.Username ?? string.Empty;
+        txtDomain.Text = settings.Domain ?? string.Empty;
         chkEnableCredSsp.CheckState = GetCheckState(settings.EnableCredSsp);
-        SetComboBoxValue(cmbAuthenticationLevel, settings.AuthenticationLevel);
 
-        cmbWidth.Text = settings.Width.ToString();
-        cmbHeight.Text = settings.Height.ToString();
-        SetComboBoxValue(cmbColorDepth, settings.ColorDepth);
-        SetComboBoxValue(cmbScaleFactor, settings.ScaleFactor);
-        chkSmartSizing.CheckState = GetCheckState(settings.SmartSizing);
-        chkAutoResize.CheckState = GetCheckState(settings.AutoResize);
-        LoadScreenModeComboBoxToUi(settings.ScreenMode, settings.UseAllMonitors);
-        chkEnableCompression.CheckState = GetCheckState(settings.EnableCompression);
-        chkEnableBitmapPersistence.CheckState = GetCheckState(settings.EnableBitmapPersistence);
-
+        SetComboBoxValue(cmbKeyboardMode, settings.KeyboardMode);
         SetComboBoxValue(cmbAudioMode, settings.AudioPlaybackMode);
         SetComboBoxValue(cmbRedirectAudioCapture, settings.RedirectAudioCapture);
         txtRedirectDrives.Text = settings.RedirectDrives ?? string.Empty;
         chkRedirectClipboard.CheckState = GetCheckState(settings.RedirectClipboard);
         chkRedirectPrinters.CheckState = GetCheckState(settings.RedirectPrinters);
         chkRedirectSmartCards.CheckState = GetCheckState(settings.RedirectSmartCards);
-        SetComboBoxValue(cmbKeyboardMode, settings.KeyboardMode);
+
+        LoadScreenModeComboBoxToUi(settings.ScreenMode, settings.UseAllMonitors);
+        cmbWidth.Text = settings.Width.ToString();
+        cmbHeight.Text = settings.Height.ToString();
+        chkAutoResize.CheckState = GetCheckState(settings.AutoResize);
+        chkSmartSizing.CheckState = GetCheckState(settings.SmartSizing);
+        SetComboBoxValue(cmbScaleFactor, settings.ScaleFactor);
+        SetComboBoxValue(cmbColorDepth, settings.ColorDepth);
+        chkEnableCompression.CheckState = GetCheckState(settings.EnableCompression);
+        chkEnableBitmapPersistence.CheckState = GetCheckState(settings.EnableBitmapPersistence);
+
+        chkDisplayConnectionBar.CheckState = GetCheckState(settings.DisplayConnectionBar);
+        chkPinConnectionBar.CheckState = GetCheckState(settings.PinConnectionBar);
+
+        SetComboBoxValue(cmbAuthenticationLevel, settings.AuthenticationLevel);
     }
 
     private ConnectionSettings GetConnectionSettingsFromUi()
@@ -118,30 +122,33 @@ public partial class FormSettings : Form
         return new ConnectionSettings
         {
             Hostname = string.IsNullOrWhiteSpace(txtHostname.Text) ? null : txtHostname.Text,
-            Domain = string.IsNullOrWhiteSpace(txtDomain.Text) ? null : txtDomain.Text,
             Username = string.IsNullOrWhiteSpace(txtUsername.Text) ? null : txtUsername.Text,
+            Domain = string.IsNullOrWhiteSpace(txtDomain.Text) ? null : txtDomain.Text,
             EnableCredSsp = GetBoolValue(chkEnableCredSsp.CheckState),
-            AuthenticationLevel = GetComboBoxValue<AuthenticationLevel?>(cmbAuthenticationLevel),
 
-            Width = string.IsNullOrWhiteSpace(cmbWidth.Text) ? null : int.Parse(cmbWidth.Text),
-            Height = string.IsNullOrWhiteSpace(cmbHeight.Text) ? null : int.Parse(cmbHeight.Text),
-            ColorDepth = GetComboBoxValue<int?>(cmbColorDepth),
-            ScaleFactor = GetComboBoxValue<uint?>(cmbScaleFactor),
-            SmartSizing = GetBoolValue(chkSmartSizing.CheckState),
-            AutoResize = GetBoolValue(chkAutoResize.CheckState),
-            ScreenMode = screenMode,
-            UseAllMonitors = useAllMonitors,
-            EnableCompression = GetBoolValue(chkEnableCompression.CheckState),
-            EnableBitmapPersistence = GetBoolValue(chkEnableBitmapPersistence.CheckState),
-
+            KeyboardMode = GetComboBoxValue<KeyboardMode?>(cmbKeyboardMode),
             AudioPlaybackMode = GetComboBoxValue<AudioPlaybackMode?>(cmbAudioMode),
             RedirectAudioCapture = GetComboBoxValue<bool?>(cmbRedirectAudioCapture),
-
             RedirectDrives = string.IsNullOrWhiteSpace(txtRedirectDrives.Text) ? null : txtRedirectDrives.Text,
             RedirectClipboard = GetBoolValue(chkRedirectClipboard.CheckState),
             RedirectPrinters = GetBoolValue(chkRedirectPrinters.CheckState),
             RedirectSmartCards = GetBoolValue(chkRedirectSmartCards.CheckState),
-            KeyboardMode = GetComboBoxValue<KeyboardMode?>(cmbKeyboardMode)
+
+            ScreenMode = screenMode,
+            UseAllMonitors = useAllMonitors,
+            Width = string.IsNullOrWhiteSpace(cmbWidth.Text) ? null : int.Parse(cmbWidth.Text),
+            Height = string.IsNullOrWhiteSpace(cmbHeight.Text) ? null : int.Parse(cmbHeight.Text),
+            AutoResize = GetBoolValue(chkAutoResize.CheckState),
+            SmartSizing = GetBoolValue(chkSmartSizing.CheckState),
+            ScaleFactor = GetComboBoxValue<uint?>(cmbScaleFactor),
+            ColorDepth = GetComboBoxValue<int?>(cmbColorDepth),
+            EnableCompression = GetBoolValue(chkEnableCompression.CheckState),
+            EnableBitmapPersistence = GetBoolValue(chkEnableBitmapPersistence.CheckState),
+
+            DisplayConnectionBar = GetBoolValue(chkDisplayConnectionBar.CheckState),
+            PinConnectionBar = GetBoolValue(chkPinConnectionBar.CheckState),
+
+            AuthenticationLevel = GetComboBoxValue<AuthenticationLevel?>(cmbAuthenticationLevel),
         };
     }
 

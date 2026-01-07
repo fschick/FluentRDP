@@ -232,10 +232,13 @@ internal sealed class RdpConnectionService : IDisposable
             _rdpClient.SecuredSettings3.KeyboardHookMode = (int)_connectionSettings.KeyboardMode.Value;
         #endregion
 
-        #region Connection Bar Configuration
-        _rdpClient.AdvancedSettings9.DisplayConnectionBar = true;
-        _rdpClient.AdvancedSettings9.PinConnectionBar = true;
-        #endregion Connection Bar Configuration
+        #region Experience options
+        if (_connectionSettings.DisplayConnectionBar != null)
+            _rdpClient.AdvancedSettings9.DisplayConnectionBar = _connectionSettings.DisplayConnectionBar.Value;
+
+        if (_connectionSettings.PinConnectionBar != null)
+            _rdpClient.AdvancedSettings9.PinConnectionBar = _connectionSettings.PinConnectionBar.Value;
+        #endregion Experience options
     }
 
     private static (string Host, string Port) ParseHostAndPort(string? hostname)

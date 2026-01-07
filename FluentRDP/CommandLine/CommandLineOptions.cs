@@ -143,6 +143,14 @@ internal class CommandLineOptions
             { "all-monitors|multi-monitor|multimon", "Use all monitors for the remote desktop session (span across all monitors)",
                 v => settings.Connection.UseAllMonitors = v != null ? true: null },
 
+            // Experience options
+            { "show-connection-bar|display-connection-bar", "Display connection bar in fullscreen mode",
+                v => settings.Connection.DisplayConnectionBar = v != null ? true: null },
+            { "hide-connection-bar|no-connection-bar", "Hide connection bar in fullscreen mode",
+                v => settings.Connection.DisplayConnectionBar = v != null ? false: null },
+            { "pin-connection-bar", "Pin the connection bar in fullscreen mode",
+                v => settings.Connection.PinConnectionBar = v != null ? true: null },
+
             // Redirection options
             { "redirect-clipboard", "Disable clipboard redirection",
                 v => settings.Connection.RedirectClipboard = v == null ? false: null },
@@ -336,91 +344,98 @@ internal class CommandLineOptions
     /// </summary>
     private static string GetHelpText()
     {
-        return @"FluentRDP - A clean and maintainable RDP client with dynamic resize capability
+        return """
+            FluentRDP - A clean and maintainable RDP client with dynamic resize capability
 
-Usage: FluentRDP.exe [options] [hostname|rdp-file]
+            Usage: FluentRDP.exe [options] [hostname|rdp-file]
 
-Note: Auto-connect is enabled by default when a hostname is provided.
-      Use --no-auto-connect to disable this behavior.
+            Note: Auto-connect is enabled by default when a hostname is provided.
+                    Use --no-auto-connect to disable this behavior.
 
-RDP File Option:
-  --rdp, --rdp-file <path>        Load settings from an RDP file
-                                  Command line options will override RDP file settings
+            RDP file options:
+                --rdp, --rdp-file <path>        Load settings from an RDP file
+                                                Command line options will override RDP file settings
 
-Connection Options:
-  -h, --host, --hostname <host>   Remote computer hostname or IP address
-                                  Supports: hostname, IPv4, IPv6
-                                  With port: hostname:port, IPv4:port, [IPv6]:port
-                                  Examples: server.com, 10.0.0.1:3390, [2001:db8::1]:3389
-  -u, --user, --username <user>   Username for authentication
-  --password <password>           Password for authentication (not recommended)
-  -d, --domain <domain>           Domain for authentication
+            Connection options:
+                -h, --host, --hostname <host>   Remote computer hostname or IP address
+                                                Supports: hostname, IPv4, IPv6
+                                                With port: hostname:port, IPv4:port, [IPv6]:port
+                                                Examples: server.com, 10.0.0.1:3390, [2001:db8::1]:3389
+                -u, --user, --username <user>   Username for authentication
+                --password <password>           Password for authentication (not recommended)
+                -d, --domain <domain>           Domain for authentication
 
-Security Options:
-  --auth-level,                   Server authentication level for certificate validation:
-  --authentication-level <lvl>    no-warning - Connect without warning if auth fails (least secure)
-                                  no-connect - Don't connect if auth fails (most secure)
-  --enable-credssp, --credssp     Enable CredSSP (Credential Security Support Provider) authentication
-                                  for Kerberos/NTLM SSO support
+            Security options:
+                --auth-level,                   Server authentication level for certificate validation:
+                --authentication-level <lvl>    no-warning - Connect without warning if auth fails (least secure)
+                                                no-connect - Don't connect if auth fails (most secure)
+                --enable-credssp, --credssp     Enable CredSSP (Credential Security Support Provider) authentication
+                                                for Kerberos/NTLM SSO support
 
-Display Options:
-  --width <width>                 Desktop width in pixels
-  --height <height>               Desktop height in pixels
-  --color-depth <depth>           Color depth (8, 15, 16, 24, or 32, default: 32)
-  --scale, --scale-factor <pct>   DPI scale factor percentage (100, 125, 150, 200, etc.)
-                                  Use 0 for auto-detection (default: 0)
-  --smart-sizing                  Enable SmartSizing (bitmap scaling)
-  --no-auto-resize                Disable automatic resize on window resize
-  -f, --fullscreen                Start in full-screen mode
-  --use-multimon, --multimon      Use all monitors for remote desktop (span across all monitors)
-                                  Requires RDP 8.0 or later
+            Display options:
+                --width <width>                 Desktop width in pixels
+                --height <height>               Desktop height in pixels
+                --color-depth <depth>           Color depth (8, 15, 16, 24, or 32, default: 32)
+                --scale, --scale-factor <pct>   DPI scale factor percentage (100, 125, 150, 200, etc.)
+                                                Use 0 for auto-detection (default: 0)
+                --smart-sizing                  Enable SmartSizing (bitmap scaling)
+                --no-auto-resize                Disable automatic resize on window resize
+                -f, --fullscreen                Start in full-screen mode
+                --use-multimon, --multimon      Use all monitors for remote desktop (span across all monitors)
+                                                Requires RDP 8.0 or later
 
-Window Options:
-  --window-position <x,y>         Window position in pixels (format: x,y)
-  --window-size <size>            Window size in pixels (format: <width>,<height> or <width>x<height>)
-  --maximized                     Start with maximized window
-  --no-close-on-disconnect         Do not close the application window when RDP disconnects
+            Experience options:
+                --show-connection-bar           Display connection bar in fullscreen mode
+                --hide-connection-bar           Hide connection bar in fullscreen mode
+                --pin-connection-bar            Pin the connection bar in fullscreen mode
 
-Redirection Options:
-  --no-clipboard                  Disable clipboard redirection
-  --audio-mode <mode>             Audio output mode: local, remote, or none (default: local)
-  --redirect-audio-capture,       Enable audio input/microphone redirection
-  --redirect-microphone
-  --redirect-cameras <value>      Redirect cameras (* for all, device path for specific)
-  --redirect-comports,            Enable COM port redirection
-  --redirect-com-ports
-  --redirect-pnp-devices <value>, Redirect PnP devices (* for all, DynamicDevices for dynamic, device instance IDs or friendly names for specific, MTP/PTP devices)
-  --redirect-pnp <value>
-  --redirect-drives <value>       Specific drives to redirect (* for all, DynamicDrives, or paths like C:\;E:\)
-  --redirect-location             Enable location redirection
-  --redirect-printers             Enable printer redirection
-  --redirect-smartcards           Enable smart card redirection
-  --redirect-webauthn             Enable WebAuthn redirection (Windows Hello, security keys)
-  --keyboard-mode <mode>          Keyboard hook mode: local, remote, or fullscreen
+            Window options:
+                --window-position <x,y>         Window position in pixels (format: x,y)
+                --window-size <size>            Window size in pixels (format: <width>,<height> or <width>x<height>)
+                --maximized                     Start with maximized window
+                --no-close-on-disconnect         Do not close the application window when RDP disconnects
 
-Other Options:
-  --no-auto-connect               Disable automatic connection when hostname is provided
-  --help, -?, /?                  Show this help message
+            Redirection options:
+                --no-clipboard                  Disable clipboard redirection
+                --audio-mode <mode>             Audio output mode: local, remote, or none (default: local)
+                --redirect-audio-capture,       Enable audio input/microphone redirection
+                --redirect-microphone
+                --redirect-cameras <value>      Redirect cameras (* for all, device path for specific)
+                --redirect-comports,            Enable COM port redirection
+                --redirect-com-ports
+                --redirect-pnp-devices <value>, Redirect PnP devices (* for all, DynamicDevices for dynamic, device instance IDs or friendly names for specific, MTP/PTP devices)
+                --redirect-pnp <value>
+                --redirect-drives <value>       Specific drives to redirect (* for all, DynamicDrives, or paths like C:\;E:\)
+                --redirect-location             Enable location redirection
+                --redirect-printers             Enable printer redirection
+                --redirect-smartcards           Enable smart card redirection
+                --redirect-webauthn             Enable WebAuthn redirection (Windows Hello, security keys)
+                --keyboard-mode <mode>          Keyboard hook mode: local, remote, or fullscreen
 
-Examples:
-  FluentRDP.exe 192.168.1.100
-  FluentRDP.exe connection.rdp
-  FluentRDP.exe --rdp-file connection.rdp -u administrator
-  FluentRDP.exe connection.rdp -u administrator
-  FluentRDP.exe --host server.example.com -u administrator
-  FluentRDP.exe -h 10.0.0.50 -u user -w 1920 --height 1080 --scale 125
-  FluentRDP.exe server01 -u domain\\user --fullscreen --redirect-drives=*
-  FluentRDP.exe 192.168.1.100 --no-auto-connect
-  FluentRDP.exe -h server01 --maximized --window-size=1280,720
-  FluentRDP.exe -h server01 --window-position=100,100 --window-size=1024x768
-  FluentRDP.exe -h server01 --use-multimon --fullscreen
-  FluentRDP.exe -h server01 --redirect-audio-capture --redirect-cameras=* 
-  FluentRDP.exe server01 --audio-mode=remote --redirect-comports --redirect-location
-  FluentRDP.exe server01 --redirect-pnp-devices=* --redirect-drives=*
-  FluentRDP.exe server01 --redirect-pnp-devices=DynamicDevices --redirect-drives=DynamicDrives
+            Other options:
+                --no-auto-connect               Disable automatic connection when hostname is provided
+                --help, -?, /?                  Show this help message
 
-Note: When loading an RDP file, command line options will override the file settings.
-";
+            Examples:
+                FluentRDP.exe 192.168.1.100
+                FluentRDP.exe connection.rdp
+                FluentRDP.exe --rdp-file connection.rdp -u administrator
+                FluentRDP.exe connection.rdp -u administrator
+                FluentRDP.exe --host server.example.com -u administrator
+                FluentRDP.exe -h 10.0.0.50 -u user -w 1920 --height 1080 --scale 125
+                FluentRDP.exe server01 -u domain\\user --fullscreen --redirect-drives=*
+                FluentRDP.exe 192.168.1.100 --no-auto-connect
+                FluentRDP.exe -h server01 --maximized --window-size=1280,720
+                FluentRDP.exe -h server01 --window-position=100,100 --window-size=1024x768
+                FluentRDP.exe -h server01 --use-multimon --fullscreen
+                FluentRDP.exe -h server01 --redirect-audio-capture --redirect-cameras=* 
+                FluentRDP.exe server01 --audio-mode=remote --redirect-comports --redirect-location
+                FluentRDP.exe server01 --redirect-pnp-devices=* --redirect-drives=*
+                FluentRDP.exe server01 --redirect-pnp-devices=DynamicDevices --redirect-drives=DynamicDrives
+
+            Note: When loading an RDP file, command line options will override the file settings.
+
+            """;
     }
 
     /// <summary>

@@ -116,6 +116,20 @@ internal class ConnectionSettings
     public bool? EnableBitmapPersistence { get; set; }
     #endregion Display options
 
+    #region Experience options
+    /// <summary>
+    /// Gets or sets whether to display the connection bar in fullscreen mode
+    /// </summary>
+    [RdpFile("displayconnectionbar", DefaultValue = "1")]
+    public bool? DisplayConnectionBar { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether to pin the connection bar
+    /// </summary>
+    [RdpFile("pinconnectionbar", DefaultValue = "1")]
+    public bool? PinConnectionBar { get; set; }
+    #endregion Experience options
+
     #region Redirection options
     /// <summary>
     /// Gets or sets the audio playback mode
