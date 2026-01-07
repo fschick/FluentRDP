@@ -1,5 +1,6 @@
 using FluentRDP.CommandLine;
 using FluentRDP.Configuration;
+using FluentRDP.Configuration.Enums;
 using FluentRDP.Events;
 using FluentRDP.Extensions;
 using FluentRDP.Platform;
@@ -218,11 +219,12 @@ public partial class FormRdpClient : Form
         }
 
         var shiftDown = ModifierKeys.HasFlag(Keys.Shift);
+        var isFullScreen = _appSettings.Connection.ScreenMode == ScreenMode.FullScreen;
+        var useAllMonitors = _appSettings.Connection.UseAllMonitors == true;
         var noAutoResize = _appSettings.Connection.AutoResize != true;
-
         switch (m.WParam.ToInt32())
         {
-            case Interop.HTCAPTION when shiftDown:
+            case Interop.HTCAPTION when shiftDown || isFullScreen || useAllMonitors:
                 ToggleFullScreen();
                 return;
             case Interop.HTLEFT when noAutoResize:
