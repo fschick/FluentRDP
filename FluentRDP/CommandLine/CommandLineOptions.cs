@@ -95,10 +95,7 @@ internal class CommandLineOptions
         if (args.Count <= 0)
             return;
 
-        if (!string.IsNullOrEmpty(settings.Connection.Hostname))
-            return;
-
-        if (Uri.CheckHostName(settings.Connection.Hostname) == UriHostNameType.Unknown)
+        if (!args[0].IsValidHostname())
             return;
 
         settings.Connection.Hostname = args[0];

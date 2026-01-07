@@ -1,5 +1,6 @@
 using FluentRDP.Attributes;
 using FluentRDP.Configuration.Enums;
+using FluentRDP.Extensions;
 using FluentRDP.Services;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -255,8 +256,8 @@ internal class ConnectionSettings
         if (ScaleFactor is < 100 or > 500)
             errors.Add("ScaleFactor must be in the range from 100 to 500.");
 
-        if (string.IsNullOrWhiteSpace(Hostname))
-            errors.Add("Hostname is required.");
+        if (!Hostname.IsValidHostname())
+            errors.Add("Valid hostname is required.");
 
         if (string.IsNullOrWhiteSpace(Username) && EnableCredSsp != true)
             errors.Add("Username is required when CredSSP is not enabled.");
