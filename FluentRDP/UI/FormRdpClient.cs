@@ -280,7 +280,7 @@ public partial class FormRdpClient : Form
         ShowDisconnectStatus(e);
 
         var shouldCloseApp = _appSettings.Window.NoCloseOnDisconnect != true;
-        if (shouldCloseApp)
+        if (shouldCloseApp && e.IsIntentionalDisconnect)
             Close();
     }
 
