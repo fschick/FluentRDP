@@ -15,19 +15,17 @@ public partial class FormSettings : Form
 {
     private static readonly List<Size> _displayResolutions = Interop.GetAvailableDisplayResolutions();
 
-    internal ApplicationSettings? UpdatedSettings { get; private set; }
+    internal ApplicationSettings UpdatedSettings { get; private set; }
 
-    private FormSettings()
+    internal FormSettings(ApplicationSettings settings)
     {
+        ArgumentNullException.ThrowIfNull(settings);
+
         InitializeComponent();
         InitializeEnumComboBoxes();
-    }
 
-    internal FormSettings(ApplicationSettings? settings) : this()
-    {
         UpdatedSettings = settings;
-        if (settings != null)
-            LoadConnectionSettingsToUi(settings.Connection);
+        LoadConnectionSettingsToUi(UpdatedSettings.Connection);
     }
 
     private void InitializeEnumComboBoxes()
@@ -98,7 +96,7 @@ public partial class FormSettings : Form
         chkRedirectPrinters.CheckState = GetCheckState(settings.RedirectPrinters);
         chkRedirectSmartCards.CheckState = GetCheckState(settings.RedirectSmartCards);
 
-        LoadScreenModeComboBoxToUi(settings.ScreenMode, settings.UseAllMonitors);
+        SetScreenModeComboBoxToUi(settings.ScreenMode, settings.UseAllMonitors);
         cmbWidth.Text = settings.Width.ToString();
         cmbHeight.Text = settings.Height.ToString();
         chkAutoResize.CheckState = GetCheckState(settings.AutoResize);
@@ -152,6 +150,30 @@ public partial class FormSettings : Form
         };
     }
 
+    private static (ScreenMode? screenMode, bool? useAllMonitors) GetScreenModeValuesFromUi(ScreenModeOption option)
+    {
+        return option switch
+        {
+            ScreenModeOption.Windowed => (ScreenMode.Windowed, null),
+            ScreenModeOption.FullScreen => (ScreenMode.FullScreen, false),
+            ScreenModeOption.UseAllMonitors => (ScreenMode.FullScreen, true),
+            _ => (null, null)
+        };
+    }
+
+    private void SetScreenModeComboBoxToUi(ScreenMode? screenMode, bool? useAllMonitors)
+    {
+        var screenModeOption = (screenMode, useAllMonitors) switch
+        {
+            (ScreenMode.FullScreen, true) => ScreenModeOption.UseAllMonitors,
+            (ScreenMode.FullScreen, _) => ScreenModeOption.FullScreen,
+            (ScreenMode.Windowed, _) => ScreenModeOption.Windowed,
+            _ => ScreenModeOption.NotSet
+        };
+
+        SetComboBoxValue(cmbScreenMode, screenModeOption);
+    }
+
     private static CheckState GetCheckState(bool? value)
     {
         if (!value.HasValue)
@@ -169,6 +191,14 @@ public partial class FormSettings : Form
         };
     }
 
+    private static T? GetComboBoxValue<T>(ComboBox comboBox)
+    {
+        if (comboBox.SelectedItem is ComboBoxItem<T> item)
+            return item.Value;
+        return default;
+
+    }
+
     private static void SetComboBoxValue<T>(ComboBox comboBox, T value)
     {
         var indexToSelect = comboBox.Items
@@ -179,62 +209,34 @@ public partial class FormSettings : Form
         comboBox.SelectedIndex = Math.Max(0, indexToSelect);
     }
 
-    private static T? GetComboBoxValue<T>(ComboBox comboBox)
-    {
-        if (comboBox.SelectedItem is ComboBoxItem<T> item)
-            return item.Value;
-        return default;
-    }
-
-    private void LoadScreenModeComboBoxToUi(ScreenMode? screenMode, bool? useAllMonitors)
-    {
-        var screenModeOption = (screenMode, useAllMonitors) switch
-        {
-            (ScreenMode.FullScreen, true) => ScreenModeOption.UseAllMonitors,
-            (ScreenMode.FullScreen, _) => ScreenModeOption.FullScreen,
-            (ScreenMode.Windowed, _) => ScreenModeOption.Windowed,
-            _ => ScreenModeOption.NotSet
-        };
-
-        SetComboBoxValue(cmbScreenMode, screenModeOption);
-    }
-
-    private static (ScreenMode? screenMode, bool? useAllMonitors) GetScreenModeValuesFromUi(ScreenModeOption option)
-    {
-        return option switch
-        {
-            ScreenModeOption.Windowed => (ScreenMode.Windowed, null),
-            ScreenModeOption.FullScreen => (ScreenMode.FullScreen, false),
-            ScreenModeOption.UseAllMonitors => (ScreenMode.FullScreen, true),
-            _ => (null, null)
-        };
-    }
-
-    private void ExportSettingsToRdpFile()
+    private void SaveSettingsToRdpFile(bool saveAs)
     {
         var connectionSettings = GetConnectionSettingsFromUi();
-        var filename = GetRdpFilename(UpdatedSettings);
-        using var saveFileDialog = new SaveFileDialog();
-        saveFileDialog.Filter = "RDP Files (*.rdp)|*.rdp|All Files (*.*)|*.*";
-        saveFileDialog.DefaultExt = "rdp";
-        saveFileDialog.InitialDirectory = Path.GetDirectoryName(filename);
-        saveFileDialog.FileName = Path.GetFileName(filename);
-        saveFileDialog.Title = "Export RDP File";
+        var rdpFilePath = UpdatedSettings.RdpFilePath;
+        var rdpFileNotExists = !File.Exists(UpdatedSettings.RdpFilePath);
 
-        if (saveFileDialog.ShowDialog(this) != DialogResult.OK)
-            return;
+        if (saveAs || rdpFileNotExists)
+        {
+            using var saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "RDP Files (*.rdp)|*.rdp|All Files (*.*)|*.*";
+            saveFileDialog.DefaultExt = "rdp";
+            saveFileDialog.InitialDirectory = Path.GetDirectoryName(rdpFilePath);
+            saveFileDialog.FileName = Path.GetFileName(rdpFilePath);
+            saveFileDialog.Title = "Export RDP File";
 
-        RdpFileService.SaveToFile(connectionSettings, saveFileDialog.FileName);
-        UpdatedSettings?.RdpFilePath = saveFileDialog.FileName;
+            if (saveFileDialog.ShowDialog(this) != DialogResult.OK)
+                return;
+
+            UpdatedSettings.RdpFilePath = saveFileDialog.FileName;
+        }
+
+        RdpFileService.SaveToFile(connectionSettings, UpdatedSettings.RdpFilePath!);
     }
 
-    private static string GetRdpFilename(ApplicationSettings? settings)
+    private void UpdateSettingsAndClose()
     {
-        if (!string.IsNullOrWhiteSpace(settings?.RdpFilePath))
-            return settings.RdpFilePath;
-
-        var filename = settings?.Connection.Hostname ?? "connection";
-        return $"{filename}.rdp";
+        UpdatedSettings?.Connection = GetConnectionSettingsFromUi();
+        Close();
     }
 
     private static bool AllowDigitsOnly(char keyChar)
@@ -284,18 +286,8 @@ public partial class FormSettings : Form
         return lowerScreenSize;
     }
 
-    private void btnOk_Click(object sender, EventArgs e)
-    {
-        UpdatedSettings?.Connection = GetConnectionSettingsFromUi();
-        DialogResult = DialogResult.OK;
-        Close();
-    }
-
     private void btnCancel_Click(object sender, EventArgs e)
-    {
-        DialogResult = DialogResult.Cancel;
-        Close();
-    }
+        => Close();
 
     private void cmbWidth_KeyPress(object sender, KeyPressEventArgs e)
         => e.Handled = AllowDigitsOnly(e.KeyChar);
@@ -309,8 +301,8 @@ public partial class FormSettings : Form
     private void cmbHeight_TextChanged(object sender, EventArgs e)
         => AllowDigitsOnly(sender as ComboBox);
 
-    private void btnExportRdp_Click(object sender, EventArgs e)
-        => ExportSettingsToRdpFile();
+    private void btnSaveAs_Click(object sender, EventArgs e)
+        => SaveSettingsToRdpFile(true);
 
     private void chkAutoResize_CheckedChanged(object sender, EventArgs e)
     {
@@ -324,6 +316,15 @@ public partial class FormSettings : Form
     {
         if (chkSmartSizing.Checked)
             chkAutoResize.Checked = false;
+    }
+
+    private void btnConnect_Click(object sender, EventArgs e)
+        => UpdateSettingsAndClose();
+
+    private void btnSave_Click(object sender, EventArgs e)
+    {
+        SaveSettingsToRdpFile(saveAs: false);
+        UpdateSettingsAndClose();
     }
 
     private enum ScreenModeOption

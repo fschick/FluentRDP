@@ -67,12 +67,13 @@ namespace FluentRDP.UI
             lblDomain = new System.Windows.Forms.Label();
             txtHostname = new System.Windows.Forms.TextBox();
             lblHostname = new System.Windows.Forms.Label();
-            btnExportRdp = new System.Windows.Forms.Button();
-            btnOk = new System.Windows.Forms.Button();
+            btnSaveAs = new System.Windows.Forms.Button();
+            btnSave = new System.Windows.Forms.Button();
             btnCancel = new System.Windows.Forms.Button();
             grpExperience = new System.Windows.Forms.GroupBox();
             chkPinConnectionBar = new System.Windows.Forms.CheckBox();
             chkDisplayConnectionBar = new System.Windows.Forms.CheckBox();
+            btnConnect = new System.Windows.Forms.Button();
             grpServerAuthentication.SuspendLayout();
             grpRedirection.SuspendLayout();
             grpDisplay.SuspendLayout();
@@ -105,7 +106,7 @@ namespace FluentRDP.UI
             cmbRedirectAudioCapture.Location = new System.Drawing.Point(112, 80);
             cmbRedirectAudioCapture.Name = "cmbRedirectAudioCapture";
             cmbRedirectAudioCapture.Size = new System.Drawing.Size(190, 23);
-            cmbRedirectAudioCapture.TabIndex = 3;
+            cmbRedirectAudioCapture.TabIndex = 5;
             // 
             // lblRedirectAudioCapture
             // 
@@ -113,7 +114,7 @@ namespace FluentRDP.UI
             lblRedirectAudioCapture.Location = new System.Drawing.Point(6, 83);
             lblRedirectAudioCapture.Name = "lblRedirectAudioCapture";
             lblRedirectAudioCapture.Size = new System.Drawing.Size(73, 15);
-            lblRedirectAudioCapture.TabIndex = 2;
+            lblRedirectAudioCapture.TabIndex = 4;
             lblRedirectAudioCapture.Text = "Audio input:";
             // 
             // cmbAudioMode
@@ -123,7 +124,7 @@ namespace FluentRDP.UI
             cmbAudioMode.Location = new System.Drawing.Point(112, 51);
             cmbAudioMode.Name = "cmbAudioMode";
             cmbAudioMode.Size = new System.Drawing.Size(190, 23);
-            cmbAudioMode.TabIndex = 1;
+            cmbAudioMode.TabIndex = 3;
             // 
             // lblAudioPlaybackMode
             // 
@@ -131,7 +132,7 @@ namespace FluentRDP.UI
             lblAudioPlaybackMode.Location = new System.Drawing.Point(6, 54);
             lblAudioPlaybackMode.Name = "lblAudioPlaybackMode";
             lblAudioPlaybackMode.Size = new System.Drawing.Size(57, 15);
-            lblAudioPlaybackMode.TabIndex = 0;
+            lblAudioPlaybackMode.TabIndex = 2;
             lblAudioPlaybackMode.Text = "Playback:";
             // 
             // txtRedirectDrives
@@ -139,7 +140,7 @@ namespace FluentRDP.UI
             txtRedirectDrives.Location = new System.Drawing.Point(112, 109);
             txtRedirectDrives.Name = "txtRedirectDrives";
             txtRedirectDrives.Size = new System.Drawing.Size(190, 23);
-            txtRedirectDrives.TabIndex = 1;
+            txtRedirectDrives.TabIndex = 7;
             // 
             // lblRedirectDrives
             // 
@@ -147,7 +148,7 @@ namespace FluentRDP.UI
             lblRedirectDrives.Location = new System.Drawing.Point(6, 112);
             lblRedirectDrives.Name = "lblRedirectDrives";
             lblRedirectDrives.Size = new System.Drawing.Size(72, 15);
-            lblRedirectDrives.TabIndex = 0;
+            lblRedirectDrives.TabIndex = 6;
             lblRedirectDrives.Text = "Local drives:";
             // 
             // grpServerAuthentication
@@ -157,7 +158,7 @@ namespace FluentRDP.UI
             grpServerAuthentication.Location = new System.Drawing.Point(337, 314);
             grpServerAuthentication.Name = "grpServerAuthentication";
             grpServerAuthentication.Size = new System.Drawing.Size(313, 56);
-            grpServerAuthentication.TabIndex = 2;
+            grpServerAuthentication.TabIndex = 4;
             grpServerAuthentication.TabStop = false;
             grpServerAuthentication.Text = "Server authentication";
             // 
@@ -195,7 +196,7 @@ namespace FluentRDP.UI
             grpRedirection.Location = new System.Drawing.Point(12, 154);
             grpRedirection.Name = "grpRedirection";
             grpRedirection.Size = new System.Drawing.Size(313, 216);
-            grpRedirection.TabIndex = 6;
+            grpRedirection.TabIndex = 1;
             grpRedirection.TabStop = false;
             grpRedirection.Text = "Redirection";
             // 
@@ -205,7 +206,7 @@ namespace FluentRDP.UI
             chkRedirectSmartCards.Location = new System.Drawing.Point(8, 188);
             chkRedirectSmartCards.Name = "chkRedirectSmartCards";
             chkRedirectSmartCards.Size = new System.Drawing.Size(133, 19);
-            chkRedirectSmartCards.TabIndex = 3;
+            chkRedirectSmartCards.TabIndex = 10;
             chkRedirectSmartCards.Text = "Redirect smart cards";
             chkRedirectSmartCards.UseVisualStyleBackColor = true;
             // 
@@ -215,7 +216,7 @@ namespace FluentRDP.UI
             chkRedirectPrinters.Location = new System.Drawing.Point(8, 163);
             chkRedirectPrinters.Name = "chkRedirectPrinters";
             chkRedirectPrinters.Size = new System.Drawing.Size(112, 19);
-            chkRedirectPrinters.TabIndex = 1;
+            chkRedirectPrinters.TabIndex = 9;
             chkRedirectPrinters.Text = "Redirect printers";
             chkRedirectPrinters.UseVisualStyleBackColor = true;
             // 
@@ -225,7 +226,7 @@ namespace FluentRDP.UI
             chkRedirectClipboard.Location = new System.Drawing.Point(8, 138);
             chkRedirectClipboard.Name = "chkRedirectClipboard";
             chkRedirectClipboard.Size = new System.Drawing.Size(122, 19);
-            chkRedirectClipboard.TabIndex = 0;
+            chkRedirectClipboard.TabIndex = 8;
             chkRedirectClipboard.Text = "Redirect clipboard";
             chkRedirectClipboard.UseVisualStyleBackColor = true;
             // 
@@ -249,7 +250,7 @@ namespace FluentRDP.UI
             grpDisplay.Location = new System.Drawing.Point(337, 12);
             grpDisplay.Name = "grpDisplay";
             grpDisplay.Size = new System.Drawing.Size(313, 222);
-            grpDisplay.TabIndex = 1;
+            grpDisplay.TabIndex = 2;
             grpDisplay.TabStop = false;
             grpDisplay.Text = "Display";
             // 
@@ -259,7 +260,7 @@ namespace FluentRDP.UI
             cmbHeight.Location = new System.Drawing.Point(217, 50);
             cmbHeight.Name = "cmbHeight";
             cmbHeight.Size = new System.Drawing.Size(85, 23);
-            cmbHeight.TabIndex = 11;
+            cmbHeight.TabIndex = 5;
             cmbHeight.TextChanged += cmbHeight_TextChanged;
             cmbHeight.KeyPress += cmbHeight_KeyPress;
             // 
@@ -269,7 +270,7 @@ namespace FluentRDP.UI
             lblSizing.Location = new System.Drawing.Point(6, 82);
             lblSizing.Name = "lblSizing";
             lblSizing.Size = new System.Drawing.Size(78, 15);
-            lblSizing.TabIndex = 16;
+            lblSizing.TabIndex = 6;
             lblSizing.Text = "Screen sizing:";
             // 
             // cmbWidth
@@ -278,7 +279,7 @@ namespace FluentRDP.UI
             cmbWidth.Location = new System.Drawing.Point(112, 51);
             cmbWidth.Name = "cmbWidth";
             cmbWidth.Size = new System.Drawing.Size(85, 23);
-            cmbWidth.TabIndex = 10;
+            cmbWidth.TabIndex = 3;
             cmbWidth.TextChanged += cmbWidth_TextChanged;
             cmbWidth.KeyPress += cmbWidth_KeyPress;
             // 
@@ -288,7 +289,7 @@ namespace FluentRDP.UI
             chkEnableBitmapPersistence.Location = new System.Drawing.Point(8, 188);
             chkEnableBitmapPersistence.Name = "chkEnableBitmapPersistence";
             chkEnableBitmapPersistence.Size = new System.Drawing.Size(164, 19);
-            chkEnableBitmapPersistence.TabIndex = 13;
+            chkEnableBitmapPersistence.TabIndex = 14;
             chkEnableBitmapPersistence.Text = "Enable bitmap persistence";
             chkEnableBitmapPersistence.UseVisualStyleBackColor = true;
             // 
@@ -298,7 +299,7 @@ namespace FluentRDP.UI
             chkEnableCompression.Location = new System.Drawing.Point(8, 163);
             chkEnableCompression.Name = "chkEnableCompression";
             chkEnableCompression.Size = new System.Drawing.Size(132, 19);
-            chkEnableCompression.TabIndex = 12;
+            chkEnableCompression.TabIndex = 13;
             chkEnableCompression.Text = "Enable compression";
             chkEnableCompression.UseVisualStyleBackColor = true;
             // 
@@ -317,7 +318,7 @@ namespace FluentRDP.UI
             chkAutoResize.Location = new System.Drawing.Point(112, 80);
             chkAutoResize.Name = "chkAutoResize";
             chkAutoResize.Size = new System.Drawing.Size(84, 19);
-            chkAutoResize.TabIndex = 6;
+            chkAutoResize.TabIndex = 7;
             chkAutoResize.Text = "Auto resize";
             chkAutoResize.UseVisualStyleBackColor = true;
             chkAutoResize.CheckedChanged += chkAutoResize_CheckedChanged;
@@ -337,7 +338,7 @@ namespace FluentRDP.UI
             chkSmartSizing.Location = new System.Drawing.Point(202, 80);
             chkSmartSizing.Name = "chkSmartSizing";
             chkSmartSizing.Size = new System.Drawing.Size(90, 19);
-            chkSmartSizing.TabIndex = 7;
+            chkSmartSizing.TabIndex = 8;
             chkSmartSizing.Text = "Smart sizing";
             chkSmartSizing.UseVisualStyleBackColor = true;
             chkSmartSizing.CheckedChanged += chkSmartSizing_CheckedChanged;
@@ -349,7 +350,7 @@ namespace FluentRDP.UI
             cmbScaleFactor.Location = new System.Drawing.Point(112, 105);
             cmbScaleFactor.Name = "cmbScaleFactor";
             cmbScaleFactor.Size = new System.Drawing.Size(190, 23);
-            cmbScaleFactor.TabIndex = 9;
+            cmbScaleFactor.TabIndex = 10;
             // 
             // lblScaleFactor
             // 
@@ -357,7 +358,7 @@ namespace FluentRDP.UI
             lblScaleFactor.Location = new System.Drawing.Point(6, 108);
             lblScaleFactor.Name = "lblScaleFactor";
             lblScaleFactor.Size = new System.Drawing.Size(94, 15);
-            lblScaleFactor.TabIndex = 8;
+            lblScaleFactor.TabIndex = 9;
             lblScaleFactor.Text = "DPI Scale Factor:";
             // 
             // cmbColorDepth
@@ -367,7 +368,7 @@ namespace FluentRDP.UI
             cmbColorDepth.Location = new System.Drawing.Point(112, 134);
             cmbColorDepth.Name = "cmbColorDepth";
             cmbColorDepth.Size = new System.Drawing.Size(190, 23);
-            cmbColorDepth.TabIndex = 11;
+            cmbColorDepth.TabIndex = 12;
             // 
             // lblColorDepth
             // 
@@ -375,7 +376,7 @@ namespace FluentRDP.UI
             lblColorDepth.Location = new System.Drawing.Point(6, 137);
             lblColorDepth.Name = "lblColorDepth";
             lblColorDepth.Size = new System.Drawing.Size(74, 15);
-            lblColorDepth.TabIndex = 10;
+            lblColorDepth.TabIndex = 11;
             lblColorDepth.Text = "Color Depth:";
             // 
             // lblHeight
@@ -470,36 +471,37 @@ namespace FluentRDP.UI
             lblHostname.TabIndex = 0;
             lblHostname.Text = "Hostname:";
             // 
-            // btnExportRdp
+            // btnSaveAs
             // 
-            btnExportRdp.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            btnExportRdp.Location = new System.Drawing.Point(12, 386);
-            btnExportRdp.Name = "btnExportRdp";
-            btnExportRdp.Size = new System.Drawing.Size(116, 23);
-            btnExportRdp.TabIndex = 9;
-            btnExportRdp.Text = "Save to RDP...";
-            btnExportRdp.UseVisualStyleBackColor = true;
-            btnExportRdp.Click += btnExportRdp_Click;
+            btnSaveAs.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            btnSaveAs.Location = new System.Drawing.Point(12, 386);
+            btnSaveAs.Name = "btnSaveAs";
+            btnSaveAs.Size = new System.Drawing.Size(91, 23);
+            btnSaveAs.TabIndex = 8;
+            btnSaveAs.Text = "Save as...";
+            btnSaveAs.UseVisualStyleBackColor = true;
+            btnSaveAs.Click += btnSaveAs_Click;
             // 
-            // btnOk
+            // btnSave
             // 
-            btnOk.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            btnOk.Location = new System.Drawing.Point(494, 386);
-            btnOk.Name = "btnOk";
-            btnOk.Size = new System.Drawing.Size(75, 23);
-            btnOk.TabIndex = 7;
-            btnOk.Text = "OK";
-            btnOk.UseVisualStyleBackColor = true;
-            btnOk.Click += btnOk_Click;
+            btnSave.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            btnSave.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            btnSave.Location = new System.Drawing.Point(413, 386);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new System.Drawing.Size(75, 23);
+            btnSave.TabIndex = 5;
+            btnSave.Text = "Save";
+            btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += btnSave_Click;
             // 
             // btnCancel
             // 
             btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            btnCancel.Location = new System.Drawing.Point(575, 386);
+            btnCancel.Location = new System.Drawing.Point(494, 386);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new System.Drawing.Size(75, 23);
-            btnCancel.TabIndex = 8;
+            btnCancel.TabIndex = 6;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
@@ -511,7 +513,7 @@ namespace FluentRDP.UI
             grpExperience.Location = new System.Drawing.Point(337, 234);
             grpExperience.Name = "grpExperience";
             grpExperience.Size = new System.Drawing.Size(313, 74);
-            grpExperience.TabIndex = 7;
+            grpExperience.TabIndex = 3;
             grpExperience.TabStop = false;
             grpExperience.Text = "Experience";
             // 
@@ -535,17 +537,30 @@ namespace FluentRDP.UI
             chkDisplayConnectionBar.Text = "Display connection bar";
             chkDisplayConnectionBar.UseVisualStyleBackColor = true;
             // 
+            // btnConnect
+            // 
+            btnConnect.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            btnConnect.DialogResult = System.Windows.Forms.DialogResult.OK;
+            btnConnect.Location = new System.Drawing.Point(575, 386);
+            btnConnect.Name = "btnConnect";
+            btnConnect.Size = new System.Drawing.Size(75, 23);
+            btnConnect.TabIndex = 7;
+            btnConnect.Text = "Connect";
+            btnConnect.UseVisualStyleBackColor = true;
+            btnConnect.Click += btnConnect_Click;
+            // 
             // FormSettings
             // 
-            AcceptButton = btnOk;
+            AcceptButton = btnSave;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             CancelButton = btnCancel;
             ClientSize = new System.Drawing.Size(662, 421);
+            Controls.Add(btnConnect);
             Controls.Add(grpExperience);
-            Controls.Add(btnExportRdp);
+            Controls.Add(btnSaveAs);
             Controls.Add(btnCancel);
-            Controls.Add(btnOk);
+            Controls.Add(btnSave);
             Controls.Add(grpServerAuthentication);
             Controls.Add(grpRedirection);
             Controls.Add(grpDisplay);
@@ -606,8 +621,8 @@ namespace FluentRDP.UI
         private System.Windows.Forms.Label lblDomain;
         private System.Windows.Forms.TextBox txtHostname;
         private System.Windows.Forms.Label lblHostname;
-        private System.Windows.Forms.Button btnExportRdp;
-        private System.Windows.Forms.Button btnOk;
+        private System.Windows.Forms.Button btnSaveAs;
+        private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label lblHeight;
         private System.Windows.Forms.Label lblSizing;
@@ -616,5 +631,6 @@ namespace FluentRDP.UI
         private System.Windows.Forms.GroupBox grpExperience;
         private System.Windows.Forms.CheckBox chkPinConnectionBar;
         private System.Windows.Forms.CheckBox chkDisplayConnectionBar;
+        private System.Windows.Forms.Button btnConnect;
     }
 }

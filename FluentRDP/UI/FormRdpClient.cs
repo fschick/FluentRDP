@@ -59,11 +59,20 @@ public partial class FormRdpClient : Form
         while (settingsAreInvalid && ShowSettings())
             settingsAreInvalid = !_appSettings.Connection.IsValid();
 
+        panelStatus.Visible = settingsAreInvalid;
+
         if (settingsAreInvalid)
             return;
 
-        panelStatus.Visible = false;
         _rdpService.Connect(_appSettings.Connection);
+    }
+
+    private void AutConnect()
+    {
+        var autoConnectConfigured = _appSettings.NoAutoConnect != true;
+        var autoConnectSuppressed = ModifierKeys.HasFlag(Keys.Shift);
+        if (autoConnectConfigured && !autoConnectSuppressed)
+            Connect();
     }
 
     private void Disconnect()
@@ -76,7 +85,7 @@ public partial class FormRdpClient : Form
     {
         var settingsDialog = new FormSettings(_appSettings);
         var dialogConfirmed = settingsDialog.ShowDialog(this) == DialogResult.OK;
-        if (!dialogConfirmed || settingsDialog.UpdatedSettings == null)
+        if (!dialogConfirmed)
             return false;
 
         _appSettings = settingsDialog.UpdatedSettings;
@@ -190,14 +199,6 @@ public partial class FormRdpClient : Form
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
 
-    private bool AutoConnectEnabled()
-    {
-        var settingsAreValid = _appSettings.IsValid();
-        var autoConnectConfigured = _appSettings.NoAutoConnect != true;
-        var autoConnectSuppressed = ModifierKeys.HasFlag(Keys.Shift);
-        return settingsAreValid && autoConnectConfigured && !autoConnectSuppressed;
-    }
-
     /// <summary>
     /// Called after the form handle has been created
     /// </summary>
@@ -267,10 +268,7 @@ public partial class FormRdpClient : Form
     }
 
     private void RdpService_Connected(object? sender, EventArgs e)
-    {
-        panelStatus.Visible = false;
-        _formSystemMenuService.EnableMenuItem(Interop.SC_FULLSCREEN, true);
-    }
+        => _formSystemMenuService.EnableMenuItem(Interop.SC_FULLSCREEN, true);
 
     private void RdpService_Disconnected(object? sender, DisconnectedEventArgs e)
     {
@@ -302,10 +300,7 @@ public partial class FormRdpClient : Form
     {
         LoadAndApplyWindowSettings();
         UpdateWindowTitle();
-        panelStatus.Visible = !AutoConnectEnabled();
-
-        if (AutoConnectEnabled())
-            Connect();
+        AutConnect();
     }
 
     private void FormRdpClient_FormClosing(object? sender, FormClosingEventArgs e)
@@ -315,5 +310,8 @@ public partial class FormRdpClient : Form
         => Connect();
 
     private void btnSettings_Click(object? sender, EventArgs e)
-        => ShowSettings();
+    {
+        if (ShowSettings())
+            Connect();
+    }
 }
