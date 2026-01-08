@@ -7,7 +7,6 @@ namespace FluentRDP.Events;
 /// </summary>
 public class DisconnectedEventArgs : EventArgs
 {
-    public const int NO_INFO = 0x0;
     public const int LOCAL_NOT_ERROR = 0x1;
     public const int REMOTE_BY_USER = 0x2;
     public const int BY_SERVER = 0x3;

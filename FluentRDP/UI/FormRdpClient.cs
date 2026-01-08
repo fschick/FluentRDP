@@ -281,7 +281,10 @@ public partial class FormRdpClient : Form
 
         var shouldCloseApp = _appSettings.Window.NoCloseOnDisconnect != true;
         if (shouldCloseApp && e.IsIntentionalDisconnect)
+        {
             Close();
+            Application.Exit();
+        }
     }
 
     private void RdpService_FullScreenChanged(object? sender, FullScreenEventArgs e)

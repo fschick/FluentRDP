@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace FluentRDP.Services;
@@ -21,13 +22,13 @@ internal sealed class RdpConnectionService : IDisposable
     private const string DESKTOP_SCALE_FACTOR_PROPERTY = "DesktopScaleFactor";
     private const string DEVICE_SCALE_FACTOR_PROPERTY = "DeviceScaleFactor";
 
+    private readonly SemaphoreSlim _connectionSemaphore = new(1, 1);
     private readonly Control _container;
     private ConnectionSettings? _connectionSettings;
     private AxMsRdpClient10NotSafeForScripting? _rdpControl;
     private MsRdpClient10NotSafeForScripting? _rdpClient;
-    private bool _isDisposed;
-
     private bool _fullScreen;
+
     public bool FullScreen { get => _fullScreen; set => SetFullScreen(value, false); }
 
     public event EventHandler? Connected;
@@ -46,11 +47,8 @@ internal sealed class RdpConnectionService : IDisposable
 
     public void Connect(ConnectionSettings connectionSettings)
     {
-        Disconnect(true);
-
-        var wasDisposedWhileDisconnected = _isDisposed;
-        if (wasDisposedWhileDisconnected)
-            return;
+        if (_rdpControl != null)
+            Disconnect(true);
 
         _connectionSettings = connectionSettings.Clone();
 
@@ -69,7 +67,7 @@ internal sealed class RdpConnectionService : IDisposable
 
     public void Reconnect(ConnectionSettings? connectionSettings = null)
     {
-        if (_rdpClient == null || _connectionSettings == null)
+        if (_rdpControl == null || _rdpClient == null || _connectionSettings == null)
             return;
 
         var updatedSettings = connectionSettings ?? _connectionSettings;
@@ -91,17 +89,61 @@ internal sealed class RdpConnectionService : IDisposable
     public void Disconnect()
         => Disconnect(false);
 
+    private void Disconnect(bool isReconnect)
+    {
+        _rdpControl?.Disconnect();
+        CleanupConnection(DisconnectedEventArgs.LOCAL_NOT_ERROR, true);
+    }
+
     [MemberNotNull(nameof(_rdpControl), nameof(_rdpClient))]
     private void SetupConnection()
     {
-        CreateRdpControlAndClient();
-        WireRdpControlEvents();
-        ApplySettingsToRdpClient();
+        _connectionSemaphore.Wait();
+
+        try
+        {
+            if (_rdpControl != null)
+                throw new InvalidOperationException("RDP connection is already established.");
+
+            CreateRdpControlAndClient();
+            WireRdpControlEvents();
+            ApplySettingsToRdpClient();
+        }
+        finally
+        {
+            _connectionSemaphore.Release();
+        }
+    }
+
+    private void CleanupConnection(int reasonCode, bool isReconnect)
+    {
+        _connectionSemaphore.Wait();
+
+        var reason = GetErrorDescription(reasonCode);
+
+        try
+        {
+            if (_rdpControl == null)
+                return;
+
+            SetFullScreen(false, true);
+            UnwireRdpControlEvents();
+            RemoveRdpControlAndClient();
+        }
+        finally
+        {
+            _connectionSemaphore.Release();
+        }
+
+        Disconnected?.Invoke(this, new DisconnectedEventArgs(reasonCode, reason, isReconnect));
     }
 
     [MemberNotNull(nameof(_rdpControl), nameof(_rdpClient))]
     private void CreateRdpControlAndClient()
     {
+        Debug.Assert(_rdpControl is null);
+        Debug.Assert(_rdpClient is null);
+
         _rdpControl = new AxMsRdpClient10NotSafeForScripting();
 
         _rdpControl.BeginInit();
@@ -116,16 +158,38 @@ internal sealed class RdpConnectionService : IDisposable
         _rdpClient.AdvancedSettings9.ContainerHandledFullScreen = 1;
     }
 
-    [MemberNotNull(nameof(_rdpControl), nameof(_rdpClient))]
-    private void WireRdpControlEvents()
+    private void RemoveRdpControlAndClient()
     {
         Debug.Assert(_rdpControl is not null);
         Debug.Assert(_rdpClient is not null);
 
+        _container.Controls.Remove(_rdpControl);
+
+        _rdpControl.Dispose();
+        _rdpControl = null;
+        _rdpClient = null;
+    }
+
+    private void WireRdpControlEvents()
+    {
+        Debug.Assert(_rdpControl is not null);
+
         _rdpControl.OnConnected += OnConnected;
         _rdpControl.OnDisconnected += OnDisconnected;
+        _rdpControl.OnConfirmClose += OnConfirmClose;
         _rdpControl.OnRequestContainerMinimize += OnRequestContainerMinimize;
         _rdpControl.OnRequestLeaveFullScreen += OnRequestLeaveFullScreen;
+    }
+
+    private void UnwireRdpControlEvents()
+    {
+        Debug.Assert(_rdpControl is not null);
+
+        _rdpControl.OnConnected -= OnConnected;
+        _rdpControl.OnDisconnected -= OnDisconnected;
+        _rdpControl.OnConfirmClose -= OnConfirmClose;
+        _rdpControl.OnRequestContainerMinimize -= OnRequestContainerMinimize;
+        _rdpControl.OnRequestLeaveFullScreen -= OnRequestLeaveFullScreen;
     }
 
     private void ApplySettingsToRdpClient()
@@ -348,8 +412,7 @@ internal sealed class RdpConnectionService : IDisposable
 
     private void UpdateSessionDisplaySettings(ConnectionSettings connectionSettings)
     {
-        if (_rdpClient == null || _connectionSettings == null)
-            return;
+        Debug.Assert(_rdpClient is not null);
 
         _connectionSettings = connectionSettings.Clone();
 
@@ -381,31 +444,13 @@ internal sealed class RdpConnectionService : IDisposable
         catch (COMException) { }
     }
 
-    private void Disconnect(bool isReconnect)
-    {
-        if (_rdpControl == null)
-            return;
-
-        _rdpControl.RequestClose();
-        //_rdpControl.Disconnect();
-        CleanupConnection();
-        Disconnected?.Invoke(this, new DisconnectedEventArgs(DisconnectedEventArgs.LOCAL_NOT_ERROR, null, isReconnect));
-    }
-
-    private void CleanupConnection()
-    {
-        SetFullScreen(false, true);
-        UnwireRdpControlEvents();
-        RemoveRdpControlAndClient();
-    }
-
-    private void SetFullScreen(bool value, bool force)
+    private void SetFullScreen(bool value, bool forceIfDisconnected)
     {
         if (_fullScreen == value)
             return;
 
         var isDisconnected = _rdpClient?.Connected != 1;
-        if (isDisconnected && !force)
+        if (isDisconnected && !forceIfDisconnected)
             return;
 
         _fullScreen = value;
@@ -415,28 +460,6 @@ internal sealed class RdpConnectionService : IDisposable
         FullScreenChanged?.Invoke(this, fullScreenEventArgs);
     }
 
-    private void UnwireRdpControlEvents()
-    {
-        Debug.Assert(_rdpControl is not null);
-
-        _rdpControl.OnConnected -= OnConnected;
-        _rdpControl.OnDisconnected -= OnDisconnected;
-        _rdpControl.OnRequestContainerMinimize -= OnRequestContainerMinimize;
-        _rdpControl.OnRequestLeaveFullScreen -= OnRequestLeaveFullScreen;
-    }
-
-    private void RemoveRdpControlAndClient()
-    {
-        if (_rdpControl == null)
-            return;
-
-        _container.Controls.Remove(_rdpControl);
-
-        _rdpControl.Dispose();
-        _rdpControl = null;
-        _rdpClient = null;
-    }
-
     private string? GetErrorDescription(int reasonCode = 0)
         => _rdpClient?.GetErrorDescription((uint)reasonCode, (uint)_rdpClient.ExtendedDisconnectReason);
 
@@ -444,11 +467,10 @@ internal sealed class RdpConnectionService : IDisposable
         => Connected?.Invoke(this, EventArgs.Empty);
 
     private void OnDisconnected(object? sender, IMsTscAxEvents_OnDisconnectedEvent e)
-    {
-        var description = GetErrorDescription(e.discReason);
-        CleanupConnection();
-        Disconnected?.Invoke(this, new DisconnectedEventArgs(e.discReason, description, false));
-    }
+        => CleanupConnection(e.discReason, false);
+
+    private static void OnConfirmClose(object? sender, IMsTscAxEvents_OnConfirmCloseEvent e)
+        => e.pfAllowClose = true;
 
     private void OnRequestContainerMinimize(object? sender, EventArgs e)
         => Minimized?.Invoke(this, EventArgs.Empty);
@@ -458,17 +480,6 @@ internal sealed class RdpConnectionService : IDisposable
 
     #region IDisposable Support
     public void Dispose()
-        => Dispose(disposing: true);
-
-    private void Dispose(bool disposing)
-    {
-        if (_isDisposed)
-            return;
-
-        if (disposing)
-            Disconnect(false);
-
-        _isDisposed = true;
-    }
+        => CleanupConnection(DisconnectedEventArgs.LOCAL_NOT_ERROR, false);
     #endregion IDisposable Support
 }
