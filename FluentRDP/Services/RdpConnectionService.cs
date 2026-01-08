@@ -77,7 +77,8 @@ internal sealed class RdpConnectionService : IDisposable
                 nameof(ConnectionSettings.Width),
                 nameof(ConnectionSettings.Height),
                 nameof(ConnectionSettings.ScaleFactor),
-                nameof(ConnectionSettings.AutoResize)
+                nameof(ConnectionSettings.AutoResize),
+                nameof(ConnectionSettings.ScreenMode)
              );
 
         if (sessionCanBeUpdated)
@@ -92,7 +93,7 @@ internal sealed class RdpConnectionService : IDisposable
     private void Disconnect(bool isReconnect)
     {
         _rdpControl?.Disconnect();
-        CleanupConnection(DisconnectedEventArgs.LOCAL_NOT_ERROR, true);
+        CleanupConnection(DisconnectedEventArgs.LOCAL_NOT_ERROR, isReconnect);
     }
 
     [MemberNotNull(nameof(_rdpControl), nameof(_rdpClient))]

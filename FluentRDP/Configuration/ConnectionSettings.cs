@@ -57,7 +57,7 @@ internal class ConnectionSettings
     /// <summary>
     /// Gets or sets the keep-alive interval in milliseconds. Sends keep-alive packets to maintain the connection.
     /// </summary>
-    [RdpFile("autoreconnect max retries")]
+    [NotMapped]
     public int? KeepAliveInterval { get; set; }
 
     /// <summary>

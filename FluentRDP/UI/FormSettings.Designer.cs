@@ -158,7 +158,7 @@ namespace FluentRDP.UI
             grpServerAuthentication.Location = new System.Drawing.Point(337, 314);
             grpServerAuthentication.Name = "grpServerAuthentication";
             grpServerAuthentication.Size = new System.Drawing.Size(313, 56);
-            grpServerAuthentication.TabIndex = 4;
+            grpServerAuthentication.TabIndex = 5;
             grpServerAuthentication.TabStop = false;
             grpServerAuthentication.Text = "Server authentication";
             // 
@@ -196,7 +196,7 @@ namespace FluentRDP.UI
             grpRedirection.Location = new System.Drawing.Point(12, 154);
             grpRedirection.Name = "grpRedirection";
             grpRedirection.Size = new System.Drawing.Size(313, 216);
-            grpRedirection.TabIndex = 1;
+            grpRedirection.TabIndex = 2;
             grpRedirection.TabStop = false;
             grpRedirection.Text = "Redirection";
             // 
@@ -250,7 +250,7 @@ namespace FluentRDP.UI
             grpDisplay.Location = new System.Drawing.Point(337, 12);
             grpDisplay.Name = "grpDisplay";
             grpDisplay.Size = new System.Drawing.Size(313, 222);
-            grpDisplay.TabIndex = 2;
+            grpDisplay.TabIndex = 3;
             grpDisplay.TabStop = false;
             grpDisplay.Text = "Display";
             // 
@@ -409,7 +409,7 @@ namespace FluentRDP.UI
             grpConnection.Location = new System.Drawing.Point(12, 12);
             grpConnection.Name = "grpConnection";
             grpConnection.Size = new System.Drawing.Size(313, 136);
-            grpConnection.TabIndex = 0;
+            grpConnection.TabIndex = 1;
             grpConnection.TabStop = false;
             grpConnection.Text = "Connection";
             // 
@@ -477,7 +477,7 @@ namespace FluentRDP.UI
             btnSaveAs.Location = new System.Drawing.Point(12, 386);
             btnSaveAs.Name = "btnSaveAs";
             btnSaveAs.Size = new System.Drawing.Size(91, 23);
-            btnSaveAs.TabIndex = 8;
+            btnSaveAs.TabIndex = 7;
             btnSaveAs.Text = "Save as...";
             btnSaveAs.UseVisualStyleBackColor = true;
             btnSaveAs.Click += btnSaveAs_Click;
@@ -485,11 +485,10 @@ namespace FluentRDP.UI
             // btnSave
             // 
             btnSave.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            btnSave.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            btnSave.Location = new System.Drawing.Point(413, 386);
+            btnSave.Location = new System.Drawing.Point(109, 386);
             btnSave.Name = "btnSave";
             btnSave.Size = new System.Drawing.Size(75, 23);
-            btnSave.TabIndex = 5;
+            btnSave.TabIndex = 6;
             btnSave.Text = "Save";
             btnSave.UseVisualStyleBackColor = true;
             btnSave.Click += btnSave_Click;
@@ -501,7 +500,7 @@ namespace FluentRDP.UI
             btnCancel.Location = new System.Drawing.Point(494, 386);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new System.Drawing.Size(75, 23);
-            btnCancel.TabIndex = 6;
+            btnCancel.TabIndex = 8;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
@@ -513,7 +512,7 @@ namespace FluentRDP.UI
             grpExperience.Location = new System.Drawing.Point(337, 234);
             grpExperience.Name = "grpExperience";
             grpExperience.Size = new System.Drawing.Size(313, 74);
-            grpExperience.TabIndex = 3;
+            grpExperience.TabIndex = 4;
             grpExperience.TabStop = false;
             grpExperience.Text = "Experience";
             // 
@@ -544,7 +543,7 @@ namespace FluentRDP.UI
             btnConnect.Location = new System.Drawing.Point(575, 386);
             btnConnect.Name = "btnConnect";
             btnConnect.Size = new System.Drawing.Size(75, 23);
-            btnConnect.TabIndex = 7;
+            btnConnect.TabIndex = 0;
             btnConnect.Text = "Connect";
             btnConnect.UseVisualStyleBackColor = true;
             btnConnect.Click += btnConnect_Click;

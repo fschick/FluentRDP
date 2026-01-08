@@ -90,6 +90,7 @@ public partial class FormRdpClient : Form
 
         _appSettings = settingsDialog.UpdatedSettings;
         _formSystemMenuService.UpdateZoomCheckmarks(_appSettings.Connection.ScaleFactor);
+        _rdpService.FullScreen = _appSettings.Connection.ScreenMode == ScreenMode.FullScreen;
         _rdpService.Reconnect(_appSettings.Connection);
         _formSizeEnforcementService.IsActive = _appSettings.Connection.AutoResize == true;
         UpdateWindowTitle();

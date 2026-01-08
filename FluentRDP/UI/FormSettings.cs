@@ -83,6 +83,10 @@ public partial class FormSettings : Form
 
     private void LoadConnectionSettingsToUi(ConnectionSettings settings)
     {
+        Text = UpdatedSettings.RdpFilePath != null
+            ? $"Settings ({Path.GetFileName(UpdatedSettings.RdpFilePath)}) - FluentRDP"
+            : "Settings - FluentRDP";
+
         txtHostname.Text = settings.Hostname ?? string.Empty;
         txtUsername.Text = settings.Username ?? string.Empty;
         txtDomain.Text = settings.Domain ?? string.Empty;
@@ -117,47 +121,47 @@ public partial class FormSettings : Form
         var screenModeOption = GetComboBoxValue<ScreenModeOption>(cmbScreenMode);
         var (screenMode, useAllMonitors) = GetScreenModeValuesFromUi(screenModeOption);
 
-        return new ConnectionSettings
-        {
-            Hostname = string.IsNullOrWhiteSpace(txtHostname.Text) ? null : txtHostname.Text,
-            Username = string.IsNullOrWhiteSpace(txtUsername.Text) ? null : txtUsername.Text,
-            Domain = string.IsNullOrWhiteSpace(txtDomain.Text) ? null : txtDomain.Text,
-            EnableCredSsp = GetBoolValue(chkEnableCredSsp.CheckState),
+        var updatedConnectionSettings = UpdatedSettings.Connection.Clone();
+        updatedConnectionSettings.Hostname = string.IsNullOrWhiteSpace(txtHostname.Text) ? null : txtHostname.Text;
+        updatedConnectionSettings.Username = string.IsNullOrWhiteSpace(txtUsername.Text) ? null : txtUsername.Text;
+        updatedConnectionSettings.Domain = string.IsNullOrWhiteSpace(txtDomain.Text) ? null : txtDomain.Text;
+        updatedConnectionSettings.EnableCredSsp = GetBoolValue(chkEnableCredSsp.CheckState);
 
-            KeyboardMode = GetComboBoxValue<KeyboardMode?>(cmbKeyboardMode),
-            AudioPlaybackMode = GetComboBoxValue<AudioPlaybackMode?>(cmbAudioMode),
-            RedirectAudioCapture = GetComboBoxValue<bool?>(cmbRedirectAudioCapture),
-            RedirectDrives = string.IsNullOrWhiteSpace(txtRedirectDrives.Text) ? null : txtRedirectDrives.Text,
-            RedirectClipboard = GetBoolValue(chkRedirectClipboard.CheckState),
-            RedirectPrinters = GetBoolValue(chkRedirectPrinters.CheckState),
-            RedirectSmartCards = GetBoolValue(chkRedirectSmartCards.CheckState),
+        updatedConnectionSettings.KeyboardMode = GetComboBoxValue<KeyboardMode?>(cmbKeyboardMode);
+        updatedConnectionSettings.AudioPlaybackMode = GetComboBoxValue<AudioPlaybackMode?>(cmbAudioMode);
+        updatedConnectionSettings.RedirectAudioCapture = GetComboBoxValue<bool?>(cmbRedirectAudioCapture);
+        updatedConnectionSettings.RedirectDrives = string.IsNullOrWhiteSpace(txtRedirectDrives.Text) ? null : txtRedirectDrives.Text;
+        updatedConnectionSettings.RedirectClipboard = GetBoolValue(chkRedirectClipboard.CheckState);
+        updatedConnectionSettings.RedirectPrinters = GetBoolValue(chkRedirectPrinters.CheckState);
+        updatedConnectionSettings.RedirectSmartCards = GetBoolValue(chkRedirectSmartCards.CheckState);
 
-            ScreenMode = screenMode,
-            UseAllMonitors = useAllMonitors,
-            Width = string.IsNullOrWhiteSpace(cmbWidth.Text) ? null : int.Parse(cmbWidth.Text),
-            Height = string.IsNullOrWhiteSpace(cmbHeight.Text) ? null : int.Parse(cmbHeight.Text),
-            AutoResize = GetBoolValue(chkAutoResize.CheckState),
-            SmartSizing = GetBoolValue(chkSmartSizing.CheckState),
-            ScaleFactor = GetComboBoxValue<uint?>(cmbScaleFactor),
-            ColorDepth = GetComboBoxValue<int?>(cmbColorDepth),
-            EnableCompression = GetBoolValue(chkEnableCompression.CheckState),
-            EnableBitmapPersistence = GetBoolValue(chkEnableBitmapPersistence.CheckState),
+        updatedConnectionSettings.ScreenMode = screenMode;
+        updatedConnectionSettings.UseAllMonitors = useAllMonitors;
+        updatedConnectionSettings.Width = string.IsNullOrWhiteSpace(cmbWidth.Text) ? null : int.Parse(cmbWidth.Text);
+        updatedConnectionSettings.Height = string.IsNullOrWhiteSpace(cmbHeight.Text) ? null : int.Parse(cmbHeight.Text);
+        updatedConnectionSettings.AutoResize = GetBoolValue(chkAutoResize.CheckState);
+        updatedConnectionSettings.SmartSizing = GetBoolValue(chkSmartSizing.CheckState);
+        updatedConnectionSettings.ScaleFactor = GetComboBoxValue<uint?>(cmbScaleFactor);
+        updatedConnectionSettings.ColorDepth = GetComboBoxValue<int?>(cmbColorDepth);
+        updatedConnectionSettings.EnableCompression = GetBoolValue(chkEnableCompression.CheckState);
+        updatedConnectionSettings.EnableBitmapPersistence = GetBoolValue(chkEnableBitmapPersistence.CheckState);
 
-            DisplayConnectionBar = GetBoolValue(chkDisplayConnectionBar.CheckState),
-            PinConnectionBar = GetBoolValue(chkPinConnectionBar.CheckState),
+        updatedConnectionSettings.DisplayConnectionBar = GetBoolValue(chkDisplayConnectionBar.CheckState);
+        updatedConnectionSettings.PinConnectionBar = GetBoolValue(chkPinConnectionBar.CheckState);
 
-            AuthenticationLevel = GetComboBoxValue<AuthenticationLevel?>(cmbAuthenticationLevel),
-        };
+        updatedConnectionSettings.AuthenticationLevel = GetComboBoxValue<AuthenticationLevel?>(cmbAuthenticationLevel);
+
+        return updatedConnectionSettings;
     }
 
-    private static (ScreenMode? screenMode, bool? useAllMonitors) GetScreenModeValuesFromUi(ScreenModeOption option)
+    private static (ScreenMode? screenMode, bool? useAllMonitors) GetScreenModeValuesFromUi(ScreenModeOption screenMode)
     {
-        return option switch
+        return screenMode switch
         {
-            ScreenModeOption.Windowed => (ScreenMode.Windowed, null),
+            ScreenModeOption.Windowed => (ScreenMode.Windowed, false),
             ScreenModeOption.FullScreen => (ScreenMode.FullScreen, false),
             ScreenModeOption.UseAllMonitors => (ScreenMode.FullScreen, true),
-            _ => (null, null)
+            _ => throw new InvalidOperationException($"Invalid screen mode {screenMode}."),
         };
     }
 
@@ -168,7 +172,7 @@ public partial class FormSettings : Form
             (ScreenMode.FullScreen, true) => ScreenModeOption.UseAllMonitors,
             (ScreenMode.FullScreen, _) => ScreenModeOption.FullScreen,
             (ScreenMode.Windowed, _) => ScreenModeOption.Windowed,
-            _ => ScreenModeOption.NotSet
+            _ => throw new InvalidOperationException($"Invalid screen mode {screenMode}."),
         };
 
         SetComboBoxValue(cmbScreenMode, screenModeOption);
@@ -235,7 +239,7 @@ public partial class FormSettings : Form
 
     private void UpdateSettingsAndClose()
     {
-        UpdatedSettings?.Connection = GetConnectionSettingsFromUi();
+        UpdatedSettings.Connection = GetConnectionSettingsFromUi();
         Close();
     }
 
@@ -322,14 +326,10 @@ public partial class FormSettings : Form
         => UpdateSettingsAndClose();
 
     private void btnSave_Click(object sender, EventArgs e)
-    {
-        SaveSettingsToRdpFile(saveAs: false);
-        UpdateSettingsAndClose();
-    }
+        => SaveSettingsToRdpFile(saveAs: false);
 
     private enum ScreenModeOption
     {
-        NotSet,
         Windowed,
         FullScreen,
         UseAllMonitors
