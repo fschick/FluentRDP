@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace FluentRDP.Services;
 
-internal sealed class RdpConnectionService : IDisposable
+internal sealed class RdpClientService : IDisposable
 {
     private const uint DEVICE_SCALE_FACTOR = 100;
     private const string RDP_CONTROL_NAME = "rdpControl";
@@ -37,7 +37,7 @@ internal sealed class RdpConnectionService : IDisposable
     public event EventHandler? Minimized;
     public event EventHandler<FullScreenEventArgs>? FullScreenChanged;
 
-    public RdpConnectionService(Control container)
+    public RdpClientService(Control container)
     {
         _container = container;
 

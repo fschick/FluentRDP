@@ -17,7 +17,7 @@ namespace FluentRDP.UI;
 
 public partial class FormRdpClient : Form
 {
-    private readonly RdpConnectionService _rdpService;
+    private readonly RdpClientService _rdpService;
     private ApplicationSettings _appSettings;
     private Rectangle _nonFullScreenBounds;
     private FormWindowState _nonFullScreenState;
@@ -51,7 +51,7 @@ public partial class FormRdpClient : Form
         _formSystemMenuService.SettingsRequested += (_, _) => ShowSettings();
         _formSystemMenuService.ZoomLevelRequested += (_, e) => SetZoomLevel(e.ZoomLevel);
 
-        _rdpService = new RdpConnectionService(panelRdp);
+        _rdpService = new RdpClientService(panelRdp);
         _rdpService.Connected += RdpService_Connected;
         _rdpService.Disconnected += RdpService_Disconnected;
         _rdpService.FullScreenChanged += RdpService_FullScreenChanged;
