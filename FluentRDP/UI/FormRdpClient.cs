@@ -73,11 +73,15 @@ public partial class FormRdpClient : Form
         _rdpService.Connect(_appSettings.Connection);
     }
 
-    private void AutConnect()
+    private void AutoStartup()
     {
         var autoConnectConfigured = _appSettings.NoAutoConnect != true;
         var autoConnectSuppressed = ModifierKeys.HasFlag(Keys.Shift);
-        if (autoConnectConfigured && !autoConnectSuppressed)
+
+        var editMode = _appSettings.EditRdpFile == true;
+        var connectFromSettings = editMode && ShowSettings();
+
+        if ((connectFromSettings || autoConnectConfigured) && !autoConnectSuppressed)
             Connect();
     }
 
@@ -355,7 +359,7 @@ public partial class FormRdpClient : Form
     {
         LoadAndApplyWindowSettings();
         UpdateWindowTitle();
-        AutConnect();
+        AutoStartup();
     }
 
     private void FormRdpClient_FormClosing(object? sender, FormClosingEventArgs e)

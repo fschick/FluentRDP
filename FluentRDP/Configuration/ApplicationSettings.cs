@@ -28,6 +28,11 @@ internal class ApplicationSettings
     public string? RdpFilePath { get; set; }
 
     /// <summary>
+    /// Opens the specified .RDP connection file for editing
+    /// </summary>
+    public bool? EditRdpFile { get; set; }
+
+    /// <summary>
     /// Indicates whether all validation checks pass
     /// </summary>
     public bool IsValid() => Validate().Count == 0;

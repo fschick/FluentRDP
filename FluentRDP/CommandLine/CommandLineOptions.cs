@@ -123,8 +123,10 @@ internal class CommandLineOptions
                 (int? v) => settings.Connection.KeepAliveInterval = v },
             { "max-reconnect-attempts=", "Maximum number of automatic reconnection attempts (default: not set)",
                 (int? v) => settings.Connection.MaxReconnectAttempts = v },
-            { "no-auto-connect|edit", "Disable automatic connection when hostname is provided",
+            { "no-auto-connect", "Disable automatic connection when hostname is provided",
                 v => settings.NoAutoConnect = v != null ? true : null },
+            { "edit", "Opens the specified .RDP connection file for editing.",
+                v => settings.EditRdpFile = v != null ? true : null },
 
             // Display options
             { "width=", "Desktop width in pixels",
