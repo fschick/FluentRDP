@@ -330,8 +330,9 @@ public partial class FormRdpClient : Form
         HideConnectingMessage();
         ShowDisconnectStatus(e);
 
-        var shouldCloseApp = _appSettings.Window.NoCloseOnDisconnect != true;
-        if (shouldCloseApp && e.IsIntentionalDisconnect)
+        var closeOnDisconnect = _appSettings.Window.NoCloseOnDisconnect != true;
+        var closeNotSuppressed = !ModifierKeys.HasFlag(Keys.Shift);
+        if (closeOnDisconnect && closeNotSuppressed && e.IsIntentionalDisconnect)
         {
             Close();
             Application.Exit();
