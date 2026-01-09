@@ -9,6 +9,8 @@ using FluentRDP.UI.Services;
 using System;
 using System.Drawing;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace FluentRDP.UI;
@@ -24,6 +26,9 @@ public partial class FormRdpClient : Form
     private readonly FormSizeEnforcementService _formSizeEnforcementService;
     private readonly FormResizeDetectionService _formResizeDetectionService;
     private readonly FormSystemMenuService _formSystemMenuService;
+
+    // Cancellation token source for delayed connection message display
+    private CancellationTokenSource? _connectionDelayCts;
 
     public FormRdpClient(string[] args)
     {
@@ -59,11 +64,12 @@ public partial class FormRdpClient : Form
         while (settingsAreInvalid && ShowSettings())
             settingsAreInvalid = !_appSettings.Connection.IsValid();
 
-        panelStatus.Visible = settingsAreInvalid;
+        panelStartup.Visible = settingsAreInvalid;
 
         if (settingsAreInvalid)
             return;
 
+        ShowConnectingMessage($"Connecting to {_appSettings.Connection.Hostname}...");
         _rdpService.Connect(_appSettings.Connection);
     }
 
@@ -76,7 +82,45 @@ public partial class FormRdpClient : Form
     }
 
     private void Disconnect()
-        => _rdpService.Disconnect();
+    {
+        HideConnectingMessage();
+        _rdpService.Disconnect();
+    }
+
+    private void ShowConnectingMessage(string message)
+    {
+        _connectionDelayCts?.Cancel();
+        _connectionDelayCts?.Dispose();
+
+        panelConnect.Visible = true;
+
+        _connectionDelayCts = new CancellationTokenSource();
+        var token = _connectionDelayCts.Token;
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(1000, token);
+                await InvokeAsync(() =>
+                {
+                    lbConnecting.Text = message;
+                    lbConnecting.Visible = true;
+                    btnCancel.Visible = true;
+                }, token);
+            }
+            catch (OperationCanceledException) { }
+        }, token);
+    }
+
+    private void HideConnectingMessage()
+    {
+        panelConnect.Visible = false;
+        lbConnecting.Visible = false;
+        btnCancel.Visible = false;
+        _connectionDelayCts?.Cancel();
+        _connectionDelayCts?.Dispose();
+        _connectionDelayCts = null;
+    }
 
     private void ToggleFullScreen()
         => _rdpService.FullScreen = !_rdpService.FullScreen;
@@ -258,6 +302,8 @@ public partial class FormRdpClient : Form
     {
         if (disposing)
         {
+            _connectionDelayCts?.Cancel();
+            _connectionDelayCts?.Dispose();
             _rdpService.Dispose();
             _formResizeDetectionService.Dispose();
             _formSizeEnforcementService.Dispose();
@@ -269,15 +315,19 @@ public partial class FormRdpClient : Form
     }
 
     private void RdpService_Connected(object? sender, EventArgs e)
-        => _formSystemMenuService.EnableMenuItem(Interop.SC_FULLSCREEN, true);
+    {
+        HideConnectingMessage();
+        _formSystemMenuService.EnableMenuItem(Interop.SC_FULLSCREEN, true);
+    }
 
     private void RdpService_Disconnected(object? sender, DisconnectedEventArgs e)
     {
         if (e.IsReconnect)
             return;
 
-        panelStatus.Visible = true;
+        panelStartup.Visible = true;
         _formSystemMenuService.EnableMenuItem(Interop.SC_FULLSCREEN, false);
+        HideConnectingMessage();
         ShowDisconnectStatus(e);
 
         var shouldCloseApp = _appSettings.Window.NoCloseOnDisconnect != true;
@@ -318,4 +368,7 @@ public partial class FormRdpClient : Form
         if (ShowSettings())
             Connect();
     }
+
+    private void btnCancel_Click(object sender, EventArgs e)
+        => Disconnect();
 }

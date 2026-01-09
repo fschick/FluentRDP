@@ -19,38 +19,57 @@ namespace FluentRDP.UI
         private void InitializeComponent()
         {
             panelRdp = new Panel();
-            panelStatus = new Panel();
+            lbRdp = new Label();
+            panelStartup = new Panel();
             lblStatusMessage = new Label();
             btnConnect = new Button();
             btnSettings = new Button();
-            panelStatus.SuspendLayout();
+            panelConnect = new Panel();
+            btnCancel = new Button();
+            lbConnecting = new Label();
+            panelRdp.SuspendLayout();
+            panelStartup.SuspendLayout();
+            panelConnect.SuspendLayout();
             SuspendLayout();
             // 
             // panelRdp
             // 
+            panelRdp.Controls.Add(lbRdp);
             panelRdp.Dock = DockStyle.Fill;
             panelRdp.Location = new Point(0, 0);
             panelRdp.Name = "panelRdp";
             panelRdp.Size = new Size(964, 511);
             panelRdp.TabIndex = 0;
             // 
-            // panelStatus
+            // lbRdp
             // 
-            panelStatus.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panelStatus.Controls.Add(lblStatusMessage);
-            panelStatus.Controls.Add(btnConnect);
-            panelStatus.Controls.Add(btnSettings);
-            panelStatus.Location = new Point(50, 50);
-            panelStatus.Name = "panelStatus";
-            panelStatus.Size = new Size(864, 411);
-            panelStatus.TabIndex = 1;
+            lbRdp.Anchor = AnchorStyles.Bottom;
+            lbRdp.Font = new Font("Segoe UI", 10F);
+            lbRdp.Location = new Point(350, 227);
+            lbRdp.Name = "lbRdp";
+            lbRdp.Size = new Size(264, 80);
+            lbRdp.TabIndex = 4;
+            lbRdp.Text = "RDP client";
+            lbRdp.TextAlign = ContentAlignment.MiddleCenter;
+            lbRdp.Visible = false;
+            // 
+            // panelStartup
+            // 
+            panelStartup.Controls.Add(lblStatusMessage);
+            panelStartup.Controls.Add(btnConnect);
+            panelStartup.Controls.Add(btnSettings);
+            panelStartup.Dock = DockStyle.Fill;
+            panelStartup.Location = new Point(0, 0);
+            panelStartup.Name = "panelStartup";
+            panelStartup.Size = new Size(964, 511);
+            panelStartup.TabIndex = 1;
             // 
             // lblStatusMessage
             // 
-            lblStatusMessage.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            lblStatusMessage.Anchor = AnchorStyles.Bottom;
             lblStatusMessage.Font = new Font("Segoe UI", 10F);
             lblStatusMessage.ForeColor = Color.DarkRed;
-            lblStatusMessage.Location = new Point(152, 325);
+            lblStatusMessage.Location = new Point(202, 425);
             lblStatusMessage.Name = "lblStatusMessage";
             lblStatusMessage.Size = new Size(560, 80);
             lblStatusMessage.TabIndex = 2;
@@ -61,7 +80,7 @@ namespace FluentRDP.UI
             // 
             btnConnect.Anchor = AnchorStyles.None;
             btnConnect.Font = new Font("Segoe UI", 14F);
-            btnConnect.Location = new Point(332, 144);
+            btnConnect.Location = new Point(382, 194);
             btnConnect.Name = "btnConnect";
             btnConnect.Size = new Size(200, 50);
             btnConnect.TabIndex = 0;
@@ -73,7 +92,7 @@ namespace FluentRDP.UI
             // 
             btnSettings.Anchor = AnchorStyles.None;
             btnSettings.Font = new Font("Segoe UI", 14F);
-            btnSettings.Location = new Point(332, 214);
+            btnSettings.Location = new Point(382, 264);
             btnSettings.Name = "btnSettings";
             btnSettings.Size = new Size(200, 50);
             btnSettings.TabIndex = 1;
@@ -81,27 +100,70 @@ namespace FluentRDP.UI
             btnSettings.UseVisualStyleBackColor = true;
             btnSettings.Click += btnSettings_Click;
             // 
+            // panelConnect
+            // 
+            panelConnect.Controls.Add(btnCancel);
+            panelConnect.Controls.Add(lbConnecting);
+            panelConnect.Dock = DockStyle.Fill;
+            panelConnect.Location = new Point(0, 0);
+            panelConnect.Name = "panelConnect";
+            panelConnect.Size = new Size(964, 511);
+            panelConnect.TabIndex = 1;
+            panelConnect.Visible = false;
+            // 
+            // btnCancel
+            // 
+            btnCancel.Anchor = AnchorStyles.None;
+            btnCancel.Font = new Font("Segoe UI", 14F);
+            btnCancel.Location = new Point(382, 275);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(200, 50);
+            btnCancel.TabIndex = 4;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Visible = false;
+            btnCancel.Click += btnCancel_Click;
+            // 
+            // lbConnecting
+            // 
+            lbConnecting.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            lbConnecting.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lbConnecting.Location = new Point(12, 208);
+            lbConnecting.Name = "lbConnecting";
+            lbConnecting.Size = new Size(940, 53);
+            lbConnecting.TabIndex = 3;
+            lbConnecting.Text = "Connecting...";
+            lbConnecting.TextAlign = ContentAlignment.MiddleCenter;
+            lbConnecting.Visible = false;
+            // 
             // FormRdpClient
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(964, 511);
-            Controls.Add(panelStatus);
+            Controls.Add(panelStartup);
+            Controls.Add(panelConnect);
             Controls.Add(panelRdp);
             Name = "FormRdpClient";
             Text = "FluentRDP";
             FormClosing += FormRdpClient_FormClosing;
             Shown += FormRdpClient_Shown;
-            panelStatus.ResumeLayout(false);
+            panelRdp.ResumeLayout(false);
+            panelStartup.ResumeLayout(false);
+            panelConnect.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
 
         private Panel panelRdp;
-        private Panel panelStatus;
+        private Panel panelStartup;
         private Label lblStatusMessage;
         private Button btnConnect;
         private Button btnSettings;
+        private Panel panelConnect;
+        private Label lbConnecting;
+        private Label lbRdp;
+        private Button btnCancel;
     }
 }
