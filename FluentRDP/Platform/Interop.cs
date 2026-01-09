@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -84,6 +84,11 @@ internal static class Interop
     // Console Constants
     public const int ATTACH_PARENT_PROCESS = -1;
 
+    // Credential Persistence Constants
+    internal const int CRED_PERSIST_SESSION = 1;
+    internal const int CRED_PERSIST_LOCAL_MACHINE = 2;
+    internal const int CRED_PERSIST_ENTERPRISE = 3;
+
     private static readonly IEnumerable<Size> _commonResolutions = [
         new(1920, 1080),
         new(1680, 1050),
@@ -167,6 +172,32 @@ internal static class Interop
     [DllImport("user32.dll")]
     public static extern int GetSystemMetrics(int nIndex);
 
+    // P/Invoke Methods - Advapi32.dll (Credential Manager)
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern bool CredRead(string targetName, CredentialType type, int reservedFlag, out IntPtr credentialPtr);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern bool CredWrite(IntPtr credential, int flags);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern bool CredDelete(string targetName, CredentialType type, int reservedFlag);
+
+    [DllImport("advapi32.dll", SetLastError = true)]
+    internal static extern bool CredFree(IntPtr credential);
+
+    // Enums
+    internal enum CredentialType
+    {
+        Generic = 1,
+        DomainPassword = 2,
+        DomainCertificate = 3,
+        DomainVisiblePassword = 4,
+        GenericCertificate = 5,
+        DomainExtended = 6,
+        Maximum = 7,
+        MaximumEx = Maximum + 1000
+    }
+
     // Structures
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT
@@ -224,5 +255,22 @@ internal static class Interop
         public int dmReserved2;
         public int dmPanningWidth;
         public int dmPanningHeight;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    internal struct CREDENTIAL
+    {
+        public int Flags;
+        public int Type;
+        public IntPtr TargetName;
+        public IntPtr Comment;
+        public System.Runtime.InteropServices.ComTypes.FILETIME LastWritten;
+        public uint CredentialBlobSize;
+        public IntPtr CredentialBlob;
+        public int Persist;
+        public int AttributeCount;
+        public IntPtr Attributes;
+        public IntPtr TargetAlias;
+        public IntPtr UserName;
     }
 }

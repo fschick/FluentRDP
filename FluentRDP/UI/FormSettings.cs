@@ -87,15 +87,18 @@ public partial class FormSettings : Form
             ? $"Settings ({Path.GetFileName(UpdatedSettings.RdpFilePath)}) - FluentRDP"
             : "Settings - FluentRDP";
 
-        txtHostname.Text = settings.Hostname ?? string.Empty;
-        txtUsername.Text = settings.Username ?? string.Empty;
-        txtDomain.Text = settings.Domain ?? string.Empty;
+        using (new TextChangedEventSuppressor(tbHostname, tbHostname_TextChanged))
+            tbHostname.Text = settings.Hostname ?? string.Empty;
+        using (new TextChangedEventSuppressor(tbUsername, tbUsername_TextChanged))
+            tbUsername.Text = settings.Username ?? string.Empty;
+        tbDomain.Text = settings.Domain ?? string.Empty;
         chkEnableCredSsp.CheckState = GetCheckState(settings.EnableCredSsp);
+        UpdateSavedCredentialHints();
 
         SetComboBoxValue(cmbKeyboardMode, settings.KeyboardMode);
         SetComboBoxValue(cmbAudioMode, settings.AudioPlaybackMode);
         SetComboBoxValue(cmbRedirectAudioCapture, settings.RedirectAudioCapture);
-        txtRedirectDrives.Text = settings.RedirectDrives ?? string.Empty;
+        tbRedirectDrives.Text = settings.RedirectDrives ?? string.Empty;
         chkRedirectClipboard.CheckState = GetCheckState(settings.RedirectClipboard);
         chkRedirectPrinters.CheckState = GetCheckState(settings.RedirectPrinters);
         chkRedirectSmartCards.CheckState = GetCheckState(settings.RedirectSmartCards);
@@ -122,15 +125,16 @@ public partial class FormSettings : Form
         var (screenMode, useAllMonitors) = GetScreenModeValuesFromUi(screenModeOption);
 
         var updatedConnectionSettings = UpdatedSettings.Connection.Clone();
-        updatedConnectionSettings.Hostname = string.IsNullOrWhiteSpace(txtHostname.Text) ? null : txtHostname.Text;
-        updatedConnectionSettings.Username = string.IsNullOrWhiteSpace(txtUsername.Text) ? null : txtUsername.Text;
-        updatedConnectionSettings.Domain = string.IsNullOrWhiteSpace(txtDomain.Text) ? null : txtDomain.Text;
+        updatedConnectionSettings.Hostname = string.IsNullOrWhiteSpace(tbHostname.Text) ? null : tbHostname.Text;
+        updatedConnectionSettings.Username = string.IsNullOrWhiteSpace(tbUsername.Text) ? null : tbUsername.Text;
+        updatedConnectionSettings.Domain = string.IsNullOrWhiteSpace(tbDomain.Text) ? null : tbDomain.Text;
+        updatedConnectionSettings.Password = string.IsNullOrWhiteSpace(tbPassword.Text) ? updatedConnectionSettings.Password : tbPassword.Text;
         updatedConnectionSettings.EnableCredSsp = GetBoolValue(chkEnableCredSsp.CheckState);
 
         updatedConnectionSettings.KeyboardMode = GetComboBoxValue<KeyboardMode?>(cmbKeyboardMode);
         updatedConnectionSettings.AudioPlaybackMode = GetComboBoxValue<AudioPlaybackMode?>(cmbAudioMode);
         updatedConnectionSettings.RedirectAudioCapture = GetComboBoxValue<bool?>(cmbRedirectAudioCapture);
-        updatedConnectionSettings.RedirectDrives = string.IsNullOrWhiteSpace(txtRedirectDrives.Text) ? null : txtRedirectDrives.Text;
+        updatedConnectionSettings.RedirectDrives = string.IsNullOrWhiteSpace(tbRedirectDrives.Text) ? null : tbRedirectDrives.Text;
         updatedConnectionSettings.RedirectClipboard = GetBoolValue(chkRedirectClipboard.CheckState);
         updatedConnectionSettings.RedirectPrinters = GetBoolValue(chkRedirectPrinters.CheckState);
         updatedConnectionSettings.RedirectSmartCards = GetBoolValue(chkRedirectSmartCards.CheckState);
@@ -211,6 +215,22 @@ public partial class FormSettings : Form
             .FindIndex(item => item.Value?.Equals(value) == true);
 
         comboBox.SelectedIndex = Math.Max(0, indexToSelect);
+    }
+
+    private void UpdateSavedCredentialHints()
+    {
+        var usernameIsEmpty = string.IsNullOrWhiteSpace(tbUsername.Text);
+        var savedUsername = RdpCredentialService.CredentialsExist(tbHostname.Text);
+        var savedCredentialsExists = savedUsername != null;
+        if (usernameIsEmpty && savedCredentialsExists)
+            using (new TextChangedEventSuppressor(tbUsername, tbUsername_TextChanged))
+                tbUsername.Text = savedUsername;
+
+        var credentialsToSaveAvailable = !string.IsNullOrWhiteSpace(tbHostname.Text) && !string.IsNullOrWhiteSpace(tbUsername.Text);
+        lbCredentialSave.Text = savedCredentialsExists ? "Update" : "Save";
+        lbCredentialSave.Visible = credentialsToSaveAvailable;
+        lbCredentialRemove.Visible = savedCredentialsExists;
+        lbCredentialRemove.Location = lbCredentialRemove.Location with { X = credentialsToSaveAvailable ? 163 : 112 };
     }
 
     private void SaveSettingsToRdpFile(bool saveAs)
@@ -327,6 +347,25 @@ public partial class FormSettings : Form
 
     private void btnSave_Click(object sender, EventArgs e)
         => SaveSettingsToRdpFile(saveAs: false);
+
+    private void tbHostname_TextChanged(object? sender, EventArgs e)
+        => UpdateSavedCredentialHints();
+
+    private void tbUsername_TextChanged(object? sender, EventArgs e)
+        => UpdateSavedCredentialHints();
+
+    private void lbCredentialSave_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        var password = string.IsNullOrWhiteSpace(tbPassword.Text) ? UpdatedSettings.Connection.Password : tbPassword.Text;
+        RdpCredentialService.SaveCredentials(tbHostname.Text, tbUsername.Text, password);
+        UpdateSavedCredentialHints();
+    }
+
+    private void lbCredentialRemove_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        RdpCredentialService.RemoveCredentials(tbHostname.Text);
+        UpdateSavedCredentialHints();
+    }
 
     private enum ScreenModeOption
     {

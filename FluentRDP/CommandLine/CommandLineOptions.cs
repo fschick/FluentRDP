@@ -185,7 +185,7 @@ internal class CommandLineOptions
                 v => ParseWindowSize(v, settings) },
             { "windows-maximized|maximized|windows-max|max", "Start with maximized window",
                 v => settings.Window.Maximized = v != null ? true: null },
-            { "no-close-on-disconnect", "Do not close the application window when RDP disconnects",
+            { "no-close-on-disconnect|no-auto-close", "Do not close the application window when RDP disconnects",
                 v => settings.Window.NoCloseOnDisconnect = v != null ? true: null },
 
             // Other options
