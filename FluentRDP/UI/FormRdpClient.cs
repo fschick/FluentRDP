@@ -144,7 +144,7 @@ public partial class FormRdpClient : Form
 
     private void ShowDisconnectStatus(DisconnectedEventArgs e)
     {
-        lblStatusMessage.Text = $"Disconnected: Error {e.ErrorCode:0}\n{e.ErrorDescription}";
+        lblStatusMessage.Text = $"Disconnected: Error {e.ReasonCode} ({(int)e.ReasonCode:0}) / {e.ExtendedReasonCode} ({(int)e.ExtendedReasonCode:0})\n{e.ErrorDescription}";
         lblStatusMessage.Visible = !e.IsIntentionalDisconnect;
     }
 

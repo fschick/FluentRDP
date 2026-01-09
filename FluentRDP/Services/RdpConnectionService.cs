@@ -3,6 +3,7 @@ using FluentRDP.Configuration;
 using FluentRDP.Configuration.Enums;
 using FluentRDP.Events;
 using FluentRDP.Extensions;
+using FluentRDP.Models;
 using MSTSCLib;
 using System;
 using System.Diagnostics;
@@ -93,7 +94,7 @@ internal sealed class RdpConnectionService : IDisposable
     private void Disconnect(bool isReconnect)
     {
         _rdpControl?.Disconnect();
-        CleanupConnection(DisconnectedEventArgs.LOCAL_NOT_ERROR, isReconnect);
+        CleanupConnection(DisconnectReasonCode.LocalNotError, DisconnectReasonCodeExt.NoInfo, isReconnect);
     }
 
     [MemberNotNull(nameof(_rdpControl), nameof(_rdpClient))]
@@ -116,11 +117,11 @@ internal sealed class RdpConnectionService : IDisposable
         }
     }
 
-    private void CleanupConnection(int reasonCode, bool isReconnect)
+    private void CleanupConnection(DisconnectReasonCode reasonCode, DisconnectReasonCodeExt extendedErrorCode, bool isReconnect)
     {
         _connectionSemaphore.Wait();
 
-        var reason = GetErrorDescription(reasonCode);
+        var reason = GetErrorDescription((int)reasonCode);
 
         try
         {
@@ -136,7 +137,7 @@ internal sealed class RdpConnectionService : IDisposable
             _connectionSemaphore.Release();
         }
 
-        Disconnected?.Invoke(this, new DisconnectedEventArgs(reasonCode, reason, isReconnect));
+        Disconnected?.Invoke(this, new DisconnectedEventArgs(reasonCode, extendedErrorCode, reason, isReconnect));
     }
 
     [MemberNotNull(nameof(_rdpControl), nameof(_rdpClient))]
@@ -468,7 +469,10 @@ internal sealed class RdpConnectionService : IDisposable
         => Connected?.Invoke(this, EventArgs.Empty);
 
     private void OnDisconnected(object? sender, IMsTscAxEvents_OnDisconnectedEvent e)
-        => CleanupConnection(e.discReason, false);
+    {
+        Debug.Assert(_rdpClient is not null);
+        CleanupConnection((DisconnectReasonCode)e.discReason, (DisconnectReasonCodeExt)_rdpClient.ExtendedDisconnectReason, false);
+    }
 
     private static void OnConfirmClose(object? sender, IMsTscAxEvents_OnConfirmCloseEvent e)
         => e.pfAllowClose = true;
@@ -481,6 +485,6 @@ internal sealed class RdpConnectionService : IDisposable
 
     #region IDisposable Support
     public void Dispose()
-        => CleanupConnection(DisconnectedEventArgs.LOCAL_NOT_ERROR, false);
+        => CleanupConnection(DisconnectReasonCode.LocalNotError, DisconnectReasonCodeExt.NoInfo, false);
     #endregion IDisposable Support
 }

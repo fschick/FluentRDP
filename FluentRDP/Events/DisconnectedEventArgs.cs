@@ -1,3 +1,4 @@
+using FluentRDP.Models;
 using System;
 
 namespace FluentRDP.Events;
@@ -7,14 +8,15 @@ namespace FluentRDP.Events;
 /// </summary>
 public class DisconnectedEventArgs : EventArgs
 {
-    public const int LOCAL_NOT_ERROR = 0x1;
-    public const int REMOTE_BY_USER = 0x2;
-    public const int BY_SERVER = 0x3;
-
     /// <summary>
     /// Gets the raw disconnect reason code.
     /// </summary>
-    public int ErrorCode { get; }
+    public DisconnectReasonCode ReasonCode { get; }
+
+    /// <summary>
+    /// Gets the raw extended disconnect reason code.
+    /// </summary>
+    public DisconnectReasonCodeExt ExtendedReasonCode { get; }
 
     /// <summary>
     /// Human-readable description of the disconnect reason
@@ -29,12 +31,14 @@ public class DisconnectedEventArgs : EventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="DisconnectedEventArgs"/> class.
     /// </summary>
-    /// <param name="reasonCode">The disconnect reason code.</param>
+    /// <param name="errorCode">The disconnect reason code.</param>
+    /// <param name="extendedErrorCode">The extended disconnect reason code.</param>
     /// <param name="errorDescription">Human-readable description of the disconnect reason</param>
     /// <param name="isReconnect"><c>true</c> if initiated by a reconnect; otherwise, <c>false</c>.</param>
-    public DisconnectedEventArgs(int reasonCode, string? errorDescription, bool isReconnect)
+    public DisconnectedEventArgs(DisconnectReasonCode errorCode, DisconnectReasonCodeExt extendedErrorCode, string? errorDescription, bool isReconnect)
     {
-        ErrorCode = reasonCode;
+        ReasonCode = errorCode;
+        ExtendedReasonCode = extendedErrorCode;
         ErrorDescription = errorDescription;
         IsReconnect = isReconnect;
     }
@@ -43,7 +47,14 @@ public class DisconnectedEventArgs : EventArgs
     /// Gets whether the disconnection was intentional (not an error).
     /// </summary>
     public bool IsIntentionalDisconnect =>
-        ErrorCode == LOCAL_NOT_ERROR ||
-        ErrorCode == REMOTE_BY_USER ||
-        ErrorCode == BY_SERVER;
+        ReasonCode
+            is DisconnectReasonCode.LocalNotError
+            or DisconnectReasonCode.RemoteByUser
+            or DisconnectReasonCode.ByServer
+        &&
+        ExtendedReasonCode
+            is DisconnectReasonCodeExt.NoInfo
+            or DisconnectReasonCodeExt.LogoffByUser
+            or DisconnectReasonCodeExt.RpcInitiatedDisconnectByUser
+            or DisconnectReasonCodeExt.ApiInitiatedDisconnect;
 }
