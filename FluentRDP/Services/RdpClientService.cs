@@ -31,6 +31,7 @@ internal sealed class RdpClientService : IDisposable
     private bool _fullScreen;
 
     public bool FullScreen { get => _fullScreen; set => SetFullScreen(value, false); }
+    public bool IsConnected => _rdpClient?.Connected == 1;
 
     public event EventHandler? Connected;
     public event EventHandler<DisconnectedEventArgs>? Disconnected;

@@ -260,6 +260,18 @@ public partial class FormRdpClient : Form
         _formSystemMenuService.UpdateZoomCheckmarks(_appSettings.Connection.ScaleFactor);
     }
 
+
+    protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+    {
+        var escapeKeyPressed = keyData == Keys.Escape;
+        var connectionActive = _rdpService.IsConnected;
+        if (!escapeKeyPressed || connectionActive)
+            return base.ProcessCmdKey(ref msg, keyData);
+
+        Close();
+        return true;
+    }
+
     protected override void WndProc(ref Message m)
     {
         var noBorderClick = m.Msg != Interop.WM_NCLBUTTONDBLCLK;
