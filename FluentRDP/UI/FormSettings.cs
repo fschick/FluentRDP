@@ -1,5 +1,6 @@
 using FluentRDP.Configuration;
 using FluentRDP.Configuration.Enums;
+using FluentRDP.Extensions;
 using FluentRDP.Platform;
 using FluentRDP.Services;
 using System;
@@ -98,8 +99,7 @@ public partial class FormSettings : Form
         cmbHostname.Items.AddRange(recentConnections);
 
         cmbHostname.Text = settings.Hostname ?? string.Empty;
-        tbUsername.Text = settings.Username ?? string.Empty;
-        tbDomain.Text = settings.Domain ?? string.Empty;
+        tbUsername.Text = settings.Username.CombineUsernameAndDomain(settings.Domain) ?? string.Empty;
         chkEnableCredSsp.CheckState = GetCheckState(settings.EnableCredSsp);
         UpdateSavedCredentialHints();
 
@@ -134,8 +134,10 @@ public partial class FormSettings : Form
 
         var updatedConnectionSettings = UpdatedSettings.Connection.Clone();
         updatedConnectionSettings.Hostname = string.IsNullOrWhiteSpace(cmbHostname.Text) ? null : cmbHostname.Text;
-        updatedConnectionSettings.Username = string.IsNullOrWhiteSpace(tbUsername.Text) ? null : tbUsername.Text;
-        updatedConnectionSettings.Domain = string.IsNullOrWhiteSpace(tbDomain.Text) ? null : tbDomain.Text;
+
+        var (username, domain) = tbUsername.Text.ParseUsernameAndDomain();
+        updatedConnectionSettings.Username = string.IsNullOrWhiteSpace(username) ? null : username;
+        updatedConnectionSettings.Domain = string.IsNullOrWhiteSpace(domain) ? null : domain;
         updatedConnectionSettings.Password = string.IsNullOrWhiteSpace(tbPassword.Text) ? updatedConnectionSettings.Password : tbPassword.Text;
         updatedConnectionSettings.EnableCredSsp = GetBoolValue(chkEnableCredSsp.CheckState);
 

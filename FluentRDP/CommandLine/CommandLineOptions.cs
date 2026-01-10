@@ -111,8 +111,8 @@ internal class CommandLineOptions
                 v => settings.Connection.Hostname = v },
             { "d|domain=", "Domain for authentication",
                 v => settings.Connection.Domain = v },
-            { "u|user|username=", "Username for authentication",
-                v => settings.Connection.Username = v },
+            { "u|user|username=", "Username for authentication. Supports formats: 'User', 'DOMAIN\\user', 'user@domain'",
+                v => ParseUsernameAndDomain(v, settings) },
             { "password=", "Password for authentication (not recommended)",
                 v => settings.Connection.Password = v },
             { "enable-credssp|credssp", "Enable CredSSP (Credential Security Support Provider) authentication",
@@ -199,6 +199,14 @@ internal class CommandLineOptions
         };
 
         return optionSet;
+    }
+
+    private static void ParseUsernameAndDomain(string value, ApplicationSettings settings)
+    {
+        var (username, domain) = value.ParseUsernameAndDomain();
+        settings.Connection.Username = username;
+        if (domain != null)
+            settings.Connection.Domain = domain;
     }
 
     /// <summary>

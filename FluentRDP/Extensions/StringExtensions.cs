@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
@@ -52,6 +52,57 @@ internal static partial class StringExtensions
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Extracts username and domain from a string value.
+    /// Supports formats: 'User', 'DOMAIN\user', and 'user@domain'.
+    /// </summary>
+    /// <param name="value">The string value to parse. Can be in format: 'User', 'DOMAIN\user', or 'user@domain'.</param>
+    /// <returns>A tuple containing the username and domain (domain may be null if not specified).</returns>
+    public static (string username, string? domain) ParseUsernameAndDomain(this string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return (string.Empty, null);
+
+        // Check for DOMAIN\user format
+        var partsByBackslash = value.Split('\\', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (partsByBackslash.Length == 2)
+        {
+            var domain = partsByBackslash[0];
+            var username = partsByBackslash[1];
+            return (username, domain);
+        }
+
+        // Check for user@domain format
+        var partsByAt = value.Split('@', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (partsByAt.Length == 2)
+        {
+            var username = partsByAt[0];
+            var domain = partsByAt[1];
+            return (username, domain);
+        }
+
+        // Plain username format
+        return (value, null);
+    }
+
+    /// <summary>
+    /// Combines username and domain into a single string.
+    /// Returns format: 'DOMAIN\user' if domain is provided, otherwise returns just the username.
+    /// </summary>
+    /// <param name="username">The username to combine.</param>
+    /// <param name="domain">The domain to combine with the username. Can be null or empty.</param>
+    /// <returns>The combined username and domain in 'DOMAIN\user' format, or just the username if domain is not provided.</returns>
+    public static string? CombineUsernameAndDomain(this string? username, string? domain)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            return null;
+
+        if (string.IsNullOrWhiteSpace(domain))
+            return username;
+
+        return $"{domain}\\{username}";
     }
 
     /// <summary>
