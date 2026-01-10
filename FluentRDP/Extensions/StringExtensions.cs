@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -7,7 +8,7 @@ namespace FluentRDP.Extensions;
 
 internal static partial class StringExtensions
 {
-    public static bool IsValidHostname(this string? ipaddressOrHostname)
+    public static bool IsValidHostname([NotNullWhen(true)] this string? ipaddressOrHostname)
     {
         if (string.IsNullOrWhiteSpace(ipaddressOrHostname))
             return false;
