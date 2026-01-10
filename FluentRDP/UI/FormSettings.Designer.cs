@@ -518,7 +518,7 @@ namespace FluentRDP.UI
             // btnSaveAs
             // 
             btnSaveAs.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            btnSaveAs.Location = new System.Drawing.Point(12, 405);
+            btnSaveAs.Location = new System.Drawing.Point(12, 409);
             btnSaveAs.Name = "btnSaveAs";
             btnSaveAs.Size = new System.Drawing.Size(91, 23);
             btnSaveAs.TabIndex = 7;
@@ -529,7 +529,7 @@ namespace FluentRDP.UI
             // btnSave
             // 
             btnSave.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            btnSave.Location = new System.Drawing.Point(111, 405);
+            btnSave.Location = new System.Drawing.Point(111, 409);
             btnSave.Name = "btnSave";
             btnSave.Size = new System.Drawing.Size(75, 23);
             btnSave.TabIndex = 8;
@@ -541,7 +541,7 @@ namespace FluentRDP.UI
             // 
             btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            btnCancel.Location = new System.Drawing.Point(600, 405);
+            btnCancel.Location = new System.Drawing.Point(600, 409);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new System.Drawing.Size(75, 23);
             btnCancel.TabIndex = 6;
@@ -584,7 +584,7 @@ namespace FluentRDP.UI
             // 
             btnConnect.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             btnConnect.DialogResult = System.Windows.Forms.DialogResult.OK;
-            btnConnect.Location = new System.Drawing.Point(519, 405);
+            btnConnect.Location = new System.Drawing.Point(519, 409);
             btnConnect.Name = "btnConnect";
             btnConnect.Size = new System.Drawing.Size(75, 23);
             btnConnect.TabIndex = 5;
@@ -594,11 +594,11 @@ namespace FluentRDP.UI
             // 
             // FormSettings
             // 
-            AcceptButton = btnSave;
+            AcceptButton = btnConnect;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             CancelButton = btnCancel;
-            ClientSize = new System.Drawing.Size(689, 440);
+            ClientSize = new System.Drawing.Size(689, 444);
             Controls.Add(btnConnect);
             Controls.Add(grpExperience);
             Controls.Add(btnSaveAs);
