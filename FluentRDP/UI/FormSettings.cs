@@ -88,18 +88,32 @@ public partial class FormSettings : Form
             ? $"Settings ({Path.GetFileName(UpdatedSettings.RdpFilePath)}) - FluentRDP"
             : "Settings - FluentRDP";
 
-        var recentConnections = RecentConnectionsService
-            .LoadAll()
+        var recentConnections = RecentConnectionsService.LoadAll()
             .OrderByDescending(x => x.LastConnected)
+            .ToList();
+
+        var recentHostnames = recentConnections
             .Select(setting => new ComboBoxItem<ConnectionSettings>(setting, setting.Hostname!))
             .Cast<object>()
             .ToArray();
 
+        var recentUsernames = recentConnections
+            .Select(setting => setting.Username.CombineUsernameAndDomain(setting.Domain))
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct()
+            .Cast<object>()
+            .ToArray();
+
         cmbHostname.Items.Clear();
-        cmbHostname.Items.AddRange(recentConnections);
+        cmbHostname.Items.AddRange(recentHostnames);
+        cmbHostname.SelectedIndex = -1;
+
+        cmbUsername.Items.Clear();
+        cmbUsername.Items.AddRange(recentUsernames);
+        cmbUsername.SelectedIndex = -1;
 
         cmbHostname.Text = settings.Hostname ?? string.Empty;
-        tbUsername.Text = settings.Username.CombineUsernameAndDomain(settings.Domain) ?? string.Empty;
+        cmbUsername.Text = settings.Username.CombineUsernameAndDomain(settings.Domain) ?? string.Empty;
         chkEnableCredSsp.CheckState = GetCheckState(settings.EnableCredSsp);
         UpdateSavedCredentialHints();
 
@@ -135,7 +149,7 @@ public partial class FormSettings : Form
         var updatedConnectionSettings = UpdatedSettings.Connection.Clone();
         updatedConnectionSettings.Hostname = string.IsNullOrWhiteSpace(cmbHostname.Text) ? null : cmbHostname.Text;
 
-        var (username, domain) = tbUsername.Text.ParseUsernameAndDomain();
+        var (username, domain) = cmbUsername.Text.ParseUsernameAndDomain();
         updatedConnectionSettings.Username = string.IsNullOrWhiteSpace(username) ? null : username;
         updatedConnectionSettings.Domain = string.IsNullOrWhiteSpace(domain) ? null : domain;
         updatedConnectionSettings.Password = string.IsNullOrWhiteSpace(tbPassword.Text) ? updatedConnectionSettings.Password : tbPassword.Text;
@@ -229,14 +243,14 @@ public partial class FormSettings : Form
 
     private void UpdateSavedCredentialHints()
     {
-        var usernameIsEmpty = string.IsNullOrWhiteSpace(tbUsername.Text);
+        var usernameIsEmpty = string.IsNullOrWhiteSpace(cmbUsername.Text);
         var savedUsername = RdpCredentialService.CredentialsExist(cmbHostname.Text);
         var savedCredentialsExists = savedUsername != null;
         if (usernameIsEmpty && savedCredentialsExists)
-            using (new TextChangedEventSuppressor(tbUsername, tbUsername_TextChanged))
-                tbUsername.Text = savedUsername;
+            using (new TextChangedEventSuppressor(cmbUsername, cmbUsername_TextChanged))
+                cmbUsername.Text = savedUsername;
 
-        var credentialsToSaveAvailable = !string.IsNullOrWhiteSpace(cmbHostname.Text) && !string.IsNullOrWhiteSpace(tbUsername.Text);
+        var credentialsToSaveAvailable = !string.IsNullOrWhiteSpace(cmbHostname.Text) && !string.IsNullOrWhiteSpace(cmbUsername.Text);
         lbCredentialSave.Text = savedCredentialsExists ? "Update" : "Save";
         lbCredentialSave.Visible = credentialsToSaveAvailable;
         lbCredentialRemove.Visible = savedCredentialsExists;
@@ -374,13 +388,16 @@ public partial class FormSettings : Form
             UpdateSavedCredentialHints();
     }
 
-    private void tbUsername_TextChanged(object? sender, EventArgs e)
-        => UpdateSavedCredentialHints();
+    private void cmbUsername_TextChanged(object? sender, EventArgs e)
+    {
+        if (!cmbUsername.DroppedDown)
+            UpdateSavedCredentialHints();
+    }
 
     private void lbCredentialSave_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
         var password = string.IsNullOrWhiteSpace(tbPassword.Text) ? UpdatedSettings.Connection.Password : tbPassword.Text;
-        RdpCredentialService.SaveCredentials(cmbHostname.Text, tbUsername.Text, password);
+        RdpCredentialService.SaveCredentials(cmbHostname.Text, cmbUsername.Text, password);
         UpdateSavedCredentialHints();
     }
 

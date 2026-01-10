@@ -60,6 +60,7 @@ namespace FluentRDP.UI
             lblHeight = new System.Windows.Forms.Label();
             lblWidthHeight = new System.Windows.Forms.Label();
             grpConnection = new System.Windows.Forms.GroupBox();
+            cmbUsername = new System.Windows.Forms.ComboBox();
             lbCredentials = new System.Windows.Forms.Label();
             tbPassword = new System.Windows.Forms.TextBox();
             lblPassword = new System.Windows.Forms.Label();
@@ -67,7 +68,6 @@ namespace FluentRDP.UI
             cmbHostname = new System.Windows.Forms.ComboBox();
             chkEnableCredSsp = new System.Windows.Forms.CheckBox();
             lbCredentialSave = new System.Windows.Forms.LinkLabel();
-            tbUsername = new System.Windows.Forms.TextBox();
             lblUsername = new System.Windows.Forms.Label();
             lblHostname = new System.Windows.Forms.Label();
             btnSaveAs = new System.Windows.Forms.Button();
@@ -161,7 +161,7 @@ namespace FluentRDP.UI
             grpServerAuthentication.Location = new System.Drawing.Point(349, 310);
             grpServerAuthentication.Name = "grpServerAuthentication";
             grpServerAuthentication.Size = new System.Drawing.Size(326, 85);
-            grpServerAuthentication.TabIndex = 5;
+            grpServerAuthentication.TabIndex = 4;
             grpServerAuthentication.TabStop = false;
             grpServerAuthentication.Text = "Server authentication";
             // 
@@ -199,7 +199,7 @@ namespace FluentRDP.UI
             grpRedirection.Location = new System.Drawing.Point(10, 179);
             grpRedirection.Name = "grpRedirection";
             grpRedirection.Size = new System.Drawing.Size(326, 216);
-            grpRedirection.TabIndex = 2;
+            grpRedirection.TabIndex = 1;
             grpRedirection.TabStop = false;
             grpRedirection.Text = "Redirection";
             // 
@@ -253,7 +253,7 @@ namespace FluentRDP.UI
             grpDisplay.Location = new System.Drawing.Point(349, 12);
             grpDisplay.Name = "grpDisplay";
             grpDisplay.Size = new System.Drawing.Size(326, 212);
-            grpDisplay.TabIndex = 3;
+            grpDisplay.TabIndex = 2;
             grpDisplay.TabStop = false;
             grpDisplay.Text = "Display";
             // 
@@ -402,6 +402,7 @@ namespace FluentRDP.UI
             // 
             // grpConnection
             // 
+            grpConnection.Controls.Add(cmbUsername);
             grpConnection.Controls.Add(lbCredentials);
             grpConnection.Controls.Add(tbPassword);
             grpConnection.Controls.Add(lblPassword);
@@ -409,7 +410,6 @@ namespace FluentRDP.UI
             grpConnection.Controls.Add(cmbHostname);
             grpConnection.Controls.Add(chkEnableCredSsp);
             grpConnection.Controls.Add(lbCredentialSave);
-            grpConnection.Controls.Add(tbUsername);
             grpConnection.Controls.Add(lblUsername);
             grpConnection.Controls.Add(lblHostname);
             grpConnection.Location = new System.Drawing.Point(10, 12);
@@ -419,13 +419,22 @@ namespace FluentRDP.UI
             grpConnection.TabStop = false;
             grpConnection.Text = "Connection";
             // 
+            // cmbUsername
+            // 
+            cmbUsername.FormattingEnabled = true;
+            cmbUsername.Location = new System.Drawing.Point(123, 51);
+            cmbUsername.Name = "cmbUsername";
+            cmbUsername.Size = new System.Drawing.Size(190, 23);
+            cmbUsername.TabIndex = 3;
+            cmbUsername.TextChanged += cmbUsername_TextChanged;
+            // 
             // lbCredentials
             // 
             lbCredentials.AutoSize = true;
             lbCredentials.Location = new System.Drawing.Point(5, 108);
             lbCredentials.Name = "lbCredentials";
             lbCredentials.Size = new System.Drawing.Size(101, 15);
-            lbCredentials.TabIndex = 8;
+            lbCredentials.TabIndex = 6;
             lbCredentials.Text = "Saved credentials:";
             // 
             // tbPassword
@@ -433,7 +442,7 @@ namespace FluentRDP.UI
             tbPassword.Location = new System.Drawing.Point(123, 80);
             tbPassword.Name = "tbPassword";
             tbPassword.Size = new System.Drawing.Size(190, 23);
-            tbPassword.TabIndex = 7;
+            tbPassword.TabIndex = 5;
             tbPassword.UseSystemPasswordChar = true;
             // 
             // lblPassword
@@ -442,7 +451,7 @@ namespace FluentRDP.UI
             lblPassword.Location = new System.Drawing.Point(6, 83);
             lblPassword.Name = "lblPassword";
             lblPassword.Size = new System.Drawing.Size(60, 15);
-            lblPassword.TabIndex = 6;
+            lblPassword.TabIndex = 4;
             lblPassword.Text = "Password:";
             // 
             // lbCredentialRemove
@@ -451,7 +460,7 @@ namespace FluentRDP.UI
             lbCredentialRemove.Location = new System.Drawing.Point(179, 108);
             lbCredentialRemove.Name = "lbCredentialRemove";
             lbCredentialRemove.Size = new System.Drawing.Size(50, 15);
-            lbCredentialRemove.TabIndex = 10;
+            lbCredentialRemove.TabIndex = 8;
             lbCredentialRemove.TabStop = true;
             lbCredentialRemove.Text = "Remove";
             lbCredentialRemove.LinkClicked += lbCredentialRemove_LinkClicked;
@@ -473,7 +482,7 @@ namespace FluentRDP.UI
             chkEnableCredSsp.Location = new System.Drawing.Point(6, 136);
             chkEnableCredSsp.Name = "chkEnableCredSsp";
             chkEnableCredSsp.Size = new System.Drawing.Size(238, 19);
-            chkEnableCredSsp.TabIndex = 11;
+            chkEnableCredSsp.TabIndex = 9;
             chkEnableCredSsp.Text = "CredSSP / Network Level Authentication";
             chkEnableCredSsp.UseVisualStyleBackColor = true;
             // 
@@ -483,18 +492,10 @@ namespace FluentRDP.UI
             lbCredentialSave.Location = new System.Drawing.Point(123, 108);
             lbCredentialSave.Name = "lbCredentialSave";
             lbCredentialSave.Size = new System.Drawing.Size(45, 15);
-            lbCredentialSave.TabIndex = 9;
+            lbCredentialSave.TabIndex = 7;
             lbCredentialSave.TabStop = true;
             lbCredentialSave.Text = "Update";
             lbCredentialSave.LinkClicked += lbCredentialSave_LinkClicked;
-            // 
-            // tbUsername
-            // 
-            tbUsername.Location = new System.Drawing.Point(123, 51);
-            tbUsername.Name = "tbUsername";
-            tbUsername.Size = new System.Drawing.Size(190, 23);
-            tbUsername.TabIndex = 3;
-            tbUsername.TextChanged += tbUsername_TextChanged;
             // 
             // lblUsername
             // 
@@ -531,7 +532,7 @@ namespace FluentRDP.UI
             btnSave.Location = new System.Drawing.Point(111, 405);
             btnSave.Name = "btnSave";
             btnSave.Size = new System.Drawing.Size(75, 23);
-            btnSave.TabIndex = 6;
+            btnSave.TabIndex = 8;
             btnSave.Text = "Save";
             btnSave.UseVisualStyleBackColor = true;
             btnSave.Click += btnSave_Click;
@@ -540,10 +541,10 @@ namespace FluentRDP.UI
             // 
             btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            btnCancel.Location = new System.Drawing.Point(520, 405);
+            btnCancel.Location = new System.Drawing.Point(600, 405);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new System.Drawing.Size(75, 23);
-            btnCancel.TabIndex = 8;
+            btnCancel.TabIndex = 6;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
@@ -555,7 +556,7 @@ namespace FluentRDP.UI
             grpExperience.Location = new System.Drawing.Point(349, 230);
             grpExperience.Name = "grpExperience";
             grpExperience.Size = new System.Drawing.Size(326, 74);
-            grpExperience.TabIndex = 4;
+            grpExperience.TabIndex = 3;
             grpExperience.TabStop = false;
             grpExperience.Text = "Experience";
             // 
@@ -583,10 +584,10 @@ namespace FluentRDP.UI
             // 
             btnConnect.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             btnConnect.DialogResult = System.Windows.Forms.DialogResult.OK;
-            btnConnect.Location = new System.Drawing.Point(600, 405);
+            btnConnect.Location = new System.Drawing.Point(519, 405);
             btnConnect.Name = "btnConnect";
             btnConnect.Size = new System.Drawing.Size(75, 23);
-            btnConnect.TabIndex = 0;
+            btnConnect.TabIndex = 5;
             btnConnect.Text = "Connect";
             btnConnect.UseVisualStyleBackColor = true;
             btnConnect.Click += btnConnect_Click;
@@ -657,7 +658,6 @@ namespace FluentRDP.UI
         private System.Windows.Forms.Label lblWidthHeight;
         private System.Windows.Forms.GroupBox grpConnection;
         private System.Windows.Forms.CheckBox chkEnableCredSsp;
-        private System.Windows.Forms.TextBox tbUsername;
         private System.Windows.Forms.Label lblUsername;
         private System.Windows.Forms.Label lblHostname;
         private System.Windows.Forms.Button btnSaveAs;
@@ -677,5 +677,6 @@ namespace FluentRDP.UI
         private System.Windows.Forms.Label lblPassword;
         private System.Windows.Forms.Label lbCredentials;
         private System.Windows.Forms.ComboBox cmbHostname;
+        private System.Windows.Forms.ComboBox cmbUsername;
     }
 }
