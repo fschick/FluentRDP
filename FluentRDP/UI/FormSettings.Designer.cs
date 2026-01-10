@@ -64,13 +64,13 @@ namespace FluentRDP.UI
             tbPassword = new System.Windows.Forms.TextBox();
             lblPassword = new System.Windows.Forms.Label();
             lbCredentialRemove = new System.Windows.Forms.LinkLabel();
+            cmbHostname = new System.Windows.Forms.ComboBox();
             chkEnableCredSsp = new System.Windows.Forms.CheckBox();
             lbCredentialSave = new System.Windows.Forms.LinkLabel();
             tbUsername = new System.Windows.Forms.TextBox();
             lblUsername = new System.Windows.Forms.Label();
             tbDomain = new System.Windows.Forms.TextBox();
             lblDomain = new System.Windows.Forms.Label();
-            tbHostname = new System.Windows.Forms.TextBox();
             lblHostname = new System.Windows.Forms.Label();
             btnSaveAs = new System.Windows.Forms.Button();
             btnSave = new System.Windows.Forms.Button();
@@ -408,13 +408,13 @@ namespace FluentRDP.UI
             grpConnection.Controls.Add(tbPassword);
             grpConnection.Controls.Add(lblPassword);
             grpConnection.Controls.Add(lbCredentialRemove);
+            grpConnection.Controls.Add(cmbHostname);
             grpConnection.Controls.Add(chkEnableCredSsp);
             grpConnection.Controls.Add(lbCredentialSave);
             grpConnection.Controls.Add(tbUsername);
             grpConnection.Controls.Add(lblUsername);
             grpConnection.Controls.Add(tbDomain);
             grpConnection.Controls.Add(lblDomain);
-            grpConnection.Controls.Add(tbHostname);
             grpConnection.Controls.Add(lblHostname);
             grpConnection.Location = new System.Drawing.Point(12, 12);
             grpConnection.Name = "grpConnection";
@@ -459,6 +459,17 @@ namespace FluentRDP.UI
             lbCredentialRemove.TabStop = true;
             lbCredentialRemove.Text = "Remove";
             lbCredentialRemove.LinkClicked += lbCredentialRemove_LinkClicked;
+            // 
+            // cmbHostname
+            // 
+            cmbHostname.FormattingEnabled = true;
+            cmbHostname.Location = new System.Drawing.Point(112, 22);
+            cmbHostname.Name = "cmbHostname";
+            cmbHostname.Size = new System.Drawing.Size(190, 23);
+            cmbHostname.TabIndex = 1;
+            cmbHostname.SelectionChangeCommitted += cmbHostname_SelectionChangeCommitted;
+            cmbHostname.TextChanged += cmbHostname_TextChanged;
+            cmbHostname.KeyDown += cmbHostname_KeyDown;
             // 
             // chkEnableCredSsp
             // 
@@ -513,14 +524,6 @@ namespace FluentRDP.UI
             lblDomain.Size = new System.Drawing.Size(52, 15);
             lblDomain.TabIndex = 4;
             lblDomain.Text = "Domain:";
-            // 
-            // tbHostname
-            // 
-            tbHostname.Location = new System.Drawing.Point(112, 22);
-            tbHostname.Name = "tbHostname";
-            tbHostname.Size = new System.Drawing.Size(190, 23);
-            tbHostname.TabIndex = 1;
-            tbHostname.TextChanged += tbHostname_TextChanged;
             // 
             // lblHostname
             // 
@@ -678,7 +681,6 @@ namespace FluentRDP.UI
         private System.Windows.Forms.Label lblUsername;
         private System.Windows.Forms.TextBox tbDomain;
         private System.Windows.Forms.Label lblDomain;
-        private System.Windows.Forms.TextBox tbHostname;
         private System.Windows.Forms.Label lblHostname;
         private System.Windows.Forms.Button btnSaveAs;
         private System.Windows.Forms.Button btnSave;
@@ -696,5 +698,6 @@ namespace FluentRDP.UI
         private System.Windows.Forms.TextBox tbPassword;
         private System.Windows.Forms.Label lblPassword;
         private System.Windows.Forms.Label lbCredentials;
+        private System.Windows.Forms.ComboBox cmbHostname;
     }
 }

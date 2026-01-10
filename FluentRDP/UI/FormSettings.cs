@@ -87,10 +87,18 @@ public partial class FormSettings : Form
             ? $"Settings ({Path.GetFileName(UpdatedSettings.RdpFilePath)}) - FluentRDP"
             : "Settings - FluentRDP";
 
-        using (new TextChangedEventSuppressor(tbHostname, tbHostname_TextChanged))
-            tbHostname.Text = settings.Hostname ?? string.Empty;
-        using (new TextChangedEventSuppressor(tbUsername, tbUsername_TextChanged))
-            tbUsername.Text = settings.Username ?? string.Empty;
+        var recentConnections = RecentConnectionsService
+            .LoadAll()
+            .OrderByDescending(x => x.LastConnected)
+            .Select(setting => new ComboBoxItem<ConnectionSettings>(setting, setting.Hostname!))
+            .Cast<object>()
+            .ToArray();
+
+        cmbHostname.Items.Clear();
+        cmbHostname.Items.AddRange(recentConnections);
+
+        cmbHostname.Text = settings.Hostname ?? string.Empty;
+        tbUsername.Text = settings.Username ?? string.Empty;
         tbDomain.Text = settings.Domain ?? string.Empty;
         chkEnableCredSsp.CheckState = GetCheckState(settings.EnableCredSsp);
         UpdateSavedCredentialHints();
@@ -125,7 +133,7 @@ public partial class FormSettings : Form
         var (screenMode, useAllMonitors) = GetScreenModeValuesFromUi(screenModeOption);
 
         var updatedConnectionSettings = UpdatedSettings.Connection.Clone();
-        updatedConnectionSettings.Hostname = string.IsNullOrWhiteSpace(tbHostname.Text) ? null : tbHostname.Text;
+        updatedConnectionSettings.Hostname = string.IsNullOrWhiteSpace(cmbHostname.Text) ? null : cmbHostname.Text;
         updatedConnectionSettings.Username = string.IsNullOrWhiteSpace(tbUsername.Text) ? null : tbUsername.Text;
         updatedConnectionSettings.Domain = string.IsNullOrWhiteSpace(tbDomain.Text) ? null : tbDomain.Text;
         updatedConnectionSettings.Password = string.IsNullOrWhiteSpace(tbPassword.Text) ? updatedConnectionSettings.Password : tbPassword.Text;
@@ -220,13 +228,13 @@ public partial class FormSettings : Form
     private void UpdateSavedCredentialHints()
     {
         var usernameIsEmpty = string.IsNullOrWhiteSpace(tbUsername.Text);
-        var savedUsername = RdpCredentialService.CredentialsExist(tbHostname.Text);
+        var savedUsername = RdpCredentialService.CredentialsExist(cmbHostname.Text);
         var savedCredentialsExists = savedUsername != null;
         if (usernameIsEmpty && savedCredentialsExists)
             using (new TextChangedEventSuppressor(tbUsername, tbUsername_TextChanged))
                 tbUsername.Text = savedUsername;
 
-        var credentialsToSaveAvailable = !string.IsNullOrWhiteSpace(tbHostname.Text) && !string.IsNullOrWhiteSpace(tbUsername.Text);
+        var credentialsToSaveAvailable = !string.IsNullOrWhiteSpace(cmbHostname.Text) && !string.IsNullOrWhiteSpace(tbUsername.Text);
         lbCredentialSave.Text = savedCredentialsExists ? "Update" : "Save";
         lbCredentialSave.Visible = credentialsToSaveAvailable;
         lbCredentialRemove.Visible = savedCredentialsExists;
@@ -310,6 +318,16 @@ public partial class FormSettings : Form
         return lowerScreenSize;
     }
 
+    private void RemoveRecent(ComboBoxItem<ConnectionSettings> selectedItem)
+    {
+        if (string.IsNullOrWhiteSpace(selectedItem.Value.Hostname))
+            return;
+
+        RecentConnectionsService.Remove(selectedItem.Value.Hostname);
+        cmbHostname.Items.Remove(selectedItem);
+        UpdateSavedCredentialHints();
+    }
+
     private void btnCancel_Click(object sender, EventArgs e)
         => Close();
 
@@ -348,8 +366,11 @@ public partial class FormSettings : Form
     private void btnSave_Click(object sender, EventArgs e)
         => SaveSettingsToRdpFile(saveAs: false);
 
-    private void tbHostname_TextChanged(object? sender, EventArgs e)
-        => UpdateSavedCredentialHints();
+    private void cmbHostname_TextChanged(object? sender, EventArgs e)
+    {
+        if (!cmbHostname.DroppedDown)
+            UpdateSavedCredentialHints();
+    }
 
     private void tbUsername_TextChanged(object? sender, EventArgs e)
         => UpdateSavedCredentialHints();
@@ -357,14 +378,34 @@ public partial class FormSettings : Form
     private void lbCredentialSave_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
         var password = string.IsNullOrWhiteSpace(tbPassword.Text) ? UpdatedSettings.Connection.Password : tbPassword.Text;
-        RdpCredentialService.SaveCredentials(tbHostname.Text, tbUsername.Text, password);
+        RdpCredentialService.SaveCredentials(cmbHostname.Text, tbUsername.Text, password);
         UpdateSavedCredentialHints();
     }
 
     private void lbCredentialRemove_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-        RdpCredentialService.RemoveCredentials(tbHostname.Text);
+        RdpCredentialService.RemoveCredentials(cmbHostname.Text);
         UpdateSavedCredentialHints();
+    }
+
+    private void cmbHostname_SelectionChangeCommitted(object sender, EventArgs e)
+    {
+        UpdatedSettings.RdpFilePath = null;
+        if (cmbHostname.SelectedItem is ComboBoxItem<ConnectionSettings> item)
+            LoadConnectionSettingsToUi(item.Value);
+    }
+
+    private void cmbHostname_KeyDown(object sender, KeyEventArgs e)
+    {
+        var isShiftDelete = e is { Shift: true, KeyCode: Keys.Delete };
+        if (!isShiftDelete)
+            return;
+
+        if (cmbHostname.SelectedItem is not ComboBoxItem<ConnectionSettings> selectedItem)
+            return;
+
+        RemoveRecent(selectedItem);
+        e.Handled = true;
     }
 
     private enum ScreenModeOption

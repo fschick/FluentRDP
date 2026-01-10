@@ -64,6 +64,7 @@ internal static class RdpFileService
         foreach (var setting in connectionSettings)
             setting.Property.SetValue(settings, setting.Value, null);
 
+        settings.LastConnected = File.GetLastWriteTimeUtc(filePath);
         return settings;
     }
 

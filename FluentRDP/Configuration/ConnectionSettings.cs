@@ -2,6 +2,7 @@ using FluentRDP.Attributes;
 using FluentRDP.Configuration.Enums;
 using FluentRDP.Extensions;
 using FluentRDP.Services;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -216,6 +217,11 @@ internal class ConnectionSettings
     [RdpFile("keyboardhook", DefaultValue = "2")]
     public KeyboardMode? KeyboardMode { get; set; }
     #endregion Redirection options
+
+    #region Fluent RDP specific settings (non-standard)
+    [NotMapped]
+    public DateTime LastConnected { get; set; }
+    #endregion Fluent RDP specific settings (non-standard)
 
     public ConnectionSettings Clone()
         => (ConnectionSettings)MemberwiseClone();

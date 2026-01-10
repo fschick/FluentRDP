@@ -75,13 +75,13 @@ public partial class FormRdpClient : Form
 
     private void AutoStartup()
     {
+        var editMode = _appSettings.EditRdpFile == true;
+        if (editMode && !ShowSettings())
+            return;
+
         var autoConnectConfigured = _appSettings.NoAutoConnect != true;
         var autoConnectSuppressed = ModifierKeys.HasFlag(Keys.Shift);
-
-        var editMode = _appSettings.EditRdpFile == true;
-        var connectFromSettings = editMode && ShowSettings();
-
-        if ((connectFromSettings || autoConnectConfigured) && !autoConnectSuppressed)
+        if (autoConnectConfigured && !autoConnectSuppressed)
             Connect();
     }
 
@@ -321,6 +321,7 @@ public partial class FormRdpClient : Form
     {
         HideConnectingMessage();
         _formSystemMenuService.EnableMenuItem(Interop.SC_FULLSCREEN, true);
+        RecentConnectionsService.AddOrUpdate(_appSettings.Connection);
     }
 
     private void RdpService_Disconnected(object? sender, DisconnectedEventArgs e)
