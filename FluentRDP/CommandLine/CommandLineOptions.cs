@@ -123,10 +123,6 @@ internal class CommandLineOptions
                 (int? v) => settings.Connection.KeepAliveInterval = v },
             { "max-reconnect-attempts=", "Maximum number of automatic reconnection attempts (default: not set)",
                 (int? v) => settings.Connection.MaxReconnectAttempts = v },
-            { "no-auto-connect", "Disable automatic connection when hostname is provided",
-                v => settings.NoAutoConnect = v != null ? true : null },
-            { "edit", "Opens the specified .RDP connection file for editing.",
-                v => settings.EditRdpFile = v != null ? true : null },
 
             // Display options
             { "width=", "Desktop width in pixels",
@@ -187,12 +183,16 @@ internal class CommandLineOptions
                 v => ParseWindowSize(v, settings) },
             { "windows-maximized|maximized|windows-max|max", "Start with maximized window",
                 v => settings.Window.Maximized = v != null ? true: null },
-            { "no-close-on-disconnect|no-auto-close", "Do not close the application window when RDP disconnects",
-                v => settings.Window.NoCloseOnDisconnect = v != null ? true: null },
 
             // Other options
+            { "no-auto-connect", "Disable automatic connection when hostname is provided",
+                v => settings.NoAutoConnect = v != null ? true : null },
+            { "no-close-on-disconnect|no-auto-close", "Do not close the application window when RDP disconnects",
+                v => settings.NoCloseOnDisconnect = v != null ? true: null },
             { "rdp|rdp-file=", "Path to an RDP file to load settings from",
                 v => settings.RdpFilePath = v },
+            { "edit", "Opens the specified .RDP connection file for editing",
+                v => settings.EditRdpFile = v != null ? true : null },
 
             { "help|?", "Show this help message",
                 v => options.ShowHelp = v != null }

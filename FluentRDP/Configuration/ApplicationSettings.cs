@@ -23,6 +23,11 @@ internal class ApplicationSettings
     public bool? NoAutoConnect { get; set; }
 
     /// <summary>
+    /// Do not close the application window when RDP disconnects
+    /// </summary>
+    public bool? NoCloseOnDisconnect { get; set; }
+
+    /// <summary>
     /// Gets or sets the path to an RDP file to load settings from
     /// </summary>
     public string? RdpFilePath { get; set; }

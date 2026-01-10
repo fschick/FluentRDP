@@ -177,7 +177,6 @@ public partial class FormRdpClient : Form
             return;
 
         var windowSettings = this.GetWindowSettings();
-        windowSettings.NoCloseOnDisconnect = _appSettings.Window.NoCloseOnDisconnect;
         var hostname = _appSettings.Connection.Hostname;
         windowSettings.Save(hostname);
     }
@@ -331,10 +330,11 @@ public partial class FormRdpClient : Form
 
         panelStartup.Visible = true;
         _formSystemMenuService.EnableMenuItem(Interop.SC_FULLSCREEN, false);
+
         HideConnectingMessage();
         ShowDisconnectStatus(e);
 
-        var closeOnDisconnect = _appSettings.Window.NoCloseOnDisconnect != true;
+        var closeOnDisconnect = _appSettings.NoCloseOnDisconnect != true;
         var closeNotSuppressed = !ModifierKeys.HasFlag(Keys.Shift);
         if (closeOnDisconnect && closeNotSuppressed && e.IsIntentionalDisconnect)
         {

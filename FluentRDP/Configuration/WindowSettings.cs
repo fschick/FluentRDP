@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace FluentRDP.Configuration;
 
@@ -32,12 +31,6 @@ internal class WindowSettings
     /// Start the window maximized
     /// </summary>
     public bool? Maximized { get; set; }
-
-    /// <summary>
-    /// Do not close the application window when RDP disconnects
-    /// </summary>
-    [JsonIgnore]
-    public bool? NoCloseOnDisconnect { get; set; }
 
     /// <summary>
     /// Indicates whether all validation checks pass
