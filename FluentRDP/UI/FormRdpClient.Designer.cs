@@ -21,7 +21,7 @@ namespace FluentRDP.UI
             panelRdp = new Panel();
             lbRdp = new Label();
             panelStartup = new Panel();
-            lblStatusMessage = new Label();
+            lblStatusMessage = new TextBox();
             btnConnect = new Button();
             btnSettings = new Button();
             panelConnect = new Panel();
@@ -66,14 +66,20 @@ namespace FluentRDP.UI
             // 
             // lblStatusMessage
             // 
-            lblStatusMessage.Anchor = AnchorStyles.Bottom;
+            lblStatusMessage.Anchor = AnchorStyles.None;
+            lblStatusMessage.BackColor = SystemColors.Control;
+            lblStatusMessage.BorderStyle = BorderStyle.None;
+            lblStatusMessage.Cursor = Cursors.IBeam;
             lblStatusMessage.Font = new Font("Segoe UI", 10F);
             lblStatusMessage.ForeColor = Color.DarkRed;
-            lblStatusMessage.Location = new Point(202, 425);
+            lblStatusMessage.Location = new Point(202, 367);
+            lblStatusMessage.Multiline = true;
             lblStatusMessage.Name = "lblStatusMessage";
-            lblStatusMessage.Size = new Size(560, 80);
+            lblStatusMessage.ReadOnly = true;
+            lblStatusMessage.Size = new Size(560, 106);
             lblStatusMessage.TabIndex = 2;
-            lblStatusMessage.TextAlign = ContentAlignment.BottomCenter;
+            lblStatusMessage.Text = "Error code / extended error code, Line 1\r\n\r\nError Message, Line 3\r\nError Message, Line 4\r\nError Message, Line 5\r\nError Message, Line 6";
+            lblStatusMessage.TextAlign = HorizontalAlignment.Center;
             lblStatusMessage.Visible = false;
             // 
             // btnConnect
@@ -150,6 +156,7 @@ namespace FluentRDP.UI
             Shown += FormRdpClient_Shown;
             panelRdp.ResumeLayout(false);
             panelStartup.ResumeLayout(false);
+            panelStartup.PerformLayout();
             panelConnect.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -158,7 +165,7 @@ namespace FluentRDP.UI
 
         private Panel panelRdp;
         private Panel panelStartup;
-        private Label lblStatusMessage;
+        private TextBox lblStatusMessage;
         private Button btnConnect;
         private Button btnSettings;
         private Panel panelConnect;

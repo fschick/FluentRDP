@@ -238,5 +238,10 @@ public enum DisconnectReasonCode
     /// <summary>
     /// The smart card is blocked.
     /// </summary>
-    SslErrSmartcardCardBlocked = 0x2207
+    SslErrSmartcardCardBlocked = 0x2207,
+
+    /// <summary>
+    /// Connection was canceled by the user or application.
+    /// </summary>
+    ConnectionCanceled = 0x1f07,
 }

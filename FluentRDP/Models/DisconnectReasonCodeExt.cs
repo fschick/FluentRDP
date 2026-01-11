@@ -74,6 +74,16 @@ public enum DisconnectReasonCodeExt
     LogoffByUser = 12,
 
     /// <summary>
+    /// The server is restarting.
+    /// </summary>
+    ServerShutdown = 25,
+
+    /// <summary>
+    /// The server is restarting.
+    /// </summary>
+    ServerRestart = 26,
+
+    /// <summary>
     /// Internal licensing error.
     /// </summary>
     LicenseInternal = 256,

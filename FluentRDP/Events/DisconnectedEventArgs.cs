@@ -51,6 +51,7 @@ public class DisconnectedEventArgs : EventArgs
             is DisconnectReasonCode.LocalNotError
             or DisconnectReasonCode.RemoteByUser
             or DisconnectReasonCode.ByServer
+            or DisconnectReasonCode.ConnectionCanceled
         &&
         ExtendedReasonCode
             is DisconnectReasonCodeExt.NoInfo
