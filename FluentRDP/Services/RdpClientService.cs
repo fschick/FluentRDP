@@ -230,6 +230,12 @@ internal sealed class RdpClientService : IDisposable
         if (_connectionSettings.KeepAliveInterval != null)
             _rdpClient.AdvancedSettings2.keepAliveInterval = _connectionSettings.KeepAliveInterval.Value;
 
+        if (_connectionSettings.ConnectionTimeout != null)
+        {
+            _rdpClient.AdvancedSettings9.overallConnectionTimeout = _connectionSettings.ConnectionTimeout.Value;
+            _rdpClient.AdvancedSettings9.singleConnectionTimeout = _connectionSettings.ConnectionTimeout.Value;
+        }
+
         if (_connectionSettings.MaxReconnectAttempts != null)
             _rdpClient.AdvancedSettings9.MaxReconnectAttempts = _connectionSettings.MaxReconnectAttempts.Value;
         #endregion Connection options

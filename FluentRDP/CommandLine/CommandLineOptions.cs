@@ -121,7 +121,9 @@ internal class CommandLineOptions
                 v => settings.Connection.AuthenticationLevel = ParseAuthenticationLevel(v) },
             { "keep-alive-interval=", "Keep-alive interval in milliseconds (default: not set)",
                 (int? v) => settings.Connection.KeepAliveInterval = v },
-            { "max-reconnect-attempts=", "Maximum number of automatic reconnection attempts (default: not set)",
+            { "connection-timeout|connect-timeout=", "Connection timeout in seconds",
+                (int? v) => settings.Connection.ConnectionTimeout = v },
+            { "max-reconnect-attempts|max-reconnect-retries=", "Maximum number of automatic reconnection attempts (default: not set)",
                 (int? v) => settings.Connection.MaxReconnectAttempts = v },
 
             // Display options

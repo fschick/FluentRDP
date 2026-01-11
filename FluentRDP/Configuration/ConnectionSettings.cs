@@ -62,6 +62,12 @@ internal class ConnectionSettings
     public int? KeepAliveInterval { get; set; }
 
     /// <summary>
+    /// Gets or sets the connection timeout in seconds. Determines how long to wait for the remote host to accept the connection.
+    /// </summary>
+    [RdpFile("connection timeout")]
+    public int? ConnectionTimeout { get; set; }
+
+    /// <summary>
     /// Gets or sets the maximum number of automatic reconnection attempts when the connection is lost.
     /// </summary>
     [RdpFile("autoreconnect max retries", DefaultValue = "20")]
