@@ -277,9 +277,6 @@ internal class ConnectionSettings
         if (!Hostname.IsValidHostname())
             errors.Add("Valid hostname is required.");
 
-        if (string.IsNullOrWhiteSpace(Username) && EnableCredSsp != true)
-            errors.Add("Username is required when CredSSP is not enabled.");
-
         return errors;
     }
     #endregion Validation
