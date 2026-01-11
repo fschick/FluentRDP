@@ -1,0 +1,27 @@
+<Project>
+	<PropertyGroup>
+		<CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Product>FluentRDP</Product>
+		<Title>$(Product)</Title>
+		<Description>Modern RDP client with live window resizing. Drop-in replacement for mstsc.exe </Description>
+		<Authors>Florian Schick</Authors>
+		<Company>Schick Software Entwicklung</Company>
+		<Copyright>© Florian Schick, 2026-$(CurrentYear) all rights reserved</Copyright>
+		<Tags></Tags>
+		<PackageDescription>$(Description)</PackageDescription>
+
+		<Version>0.0.0.0</Version>
+		<FileVersion>0.0.0.0</FileVersion>
+		<AssemblyVersion>$(FileVersion)</AssemblyVersion>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
+		<PackageProjectUrl>https://github.com/fschick/FluentRDP</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/fschick/FluentRDP</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>$(Tags)</PackageTags>
+		<PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
+	</PropertyGroup>
+</Project>

@@ -1,3 +1,14 @@
 <Solution>
+  <Folder Name="/Build/" />
+  <Folder Name="/Build/scripts/">
+    <File Path="Build/scripts/_core.ps1" />
+    <File Path="Build/scripts/fluentrdp.build.ps1" />
+    <File Path="Build/scripts/fluentrdp.publish.ps1" />
+    <File Path="Build/scripts/fluentrdp.test.ps1" />
+  </Folder>
+  <Folder Name="/Build/targets/">
+    <File Path="Build/targets/net_core.props" />
+    <File Path="Build/targets/version.props" />
+  </Folder>
   <Project Path="FluentRDP/FluentRDP.csproj" />
 </Solution>
