@@ -131,7 +131,7 @@ public partial class FormRdpClient : Form
 
     private bool ShowSettings()
     {
-        var settingsDialog = new FormSettings(_appSettings);
+        using var settingsDialog = new FormSettings(_appSettings);
         var dialogConfirmed = settingsDialog.ShowDialog(this) == DialogResult.OK;
         if (!dialogConfirmed)
             return false;

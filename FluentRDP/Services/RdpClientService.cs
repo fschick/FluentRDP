@@ -147,6 +147,7 @@ internal sealed class RdpClientService : IDisposable
         Debug.Assert(_rdpControl is null);
         Debug.Assert(_rdpClient is null);
 
+        _rdpControl?.Dispose();
         _rdpControl = new AxMsRdpClient10NotSafeForScripting();
 
         _rdpControl.BeginInit();
