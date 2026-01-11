@@ -338,7 +338,7 @@ namespace FluentRDP.UI
             // chkSmartSizing
             // 
             chkSmartSizing.AutoSize = true;
-            chkSmartSizing.Location = new System.Drawing.Point(212, 80);
+            chkSmartSizing.Location = new System.Drawing.Point(222, 81);
             chkSmartSizing.Name = "chkSmartSizing";
             chkSmartSizing.Size = new System.Drawing.Size(90, 19);
             chkSmartSizing.TabIndex = 8;
@@ -547,7 +547,6 @@ namespace FluentRDP.UI
             btnCancel.TabIndex = 6;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
-            btnCancel.Click += btnCancel_Click;
             // 
             // grpExperience
             // 
@@ -590,7 +589,6 @@ namespace FluentRDP.UI
             btnConnect.TabIndex = 5;
             btnConnect.Text = "Connect";
             btnConnect.UseVisualStyleBackColor = true;
-            btnConnect.Click += btnConnect_Click;
             // 
             // FormSettings
             // 
@@ -614,6 +612,7 @@ namespace FluentRDP.UI
             Name = "FormSettings";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "Settings - FluentRDP";
+            FormClosing += FormSettings_FormClosing;
             grpServerAuthentication.ResumeLayout(false);
             grpServerAuthentication.PerformLayout();
             grpRedirection.ResumeLayout(false);

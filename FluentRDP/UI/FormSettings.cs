@@ -254,7 +254,6 @@ public partial class FormSettings : Form
         lbCredentialSave.Text = savedCredentialsExists ? "Update" : "Save";
         lbCredentialSave.Visible = credentialsToSaveAvailable;
         lbCredentialRemove.Visible = savedCredentialsExists;
-        lbCredentialRemove.Location = lbCredentialRemove.Location with { X = credentialsToSaveAvailable ? 163 : 112 };
     }
 
     private void SaveSettingsToRdpFile(bool saveAs)
@@ -279,12 +278,6 @@ public partial class FormSettings : Form
         }
 
         RdpFileService.SaveToFile(connectionSettings, UpdatedSettings.RdpFilePath!);
-    }
-
-    private void UpdateSettingsAndClose()
-    {
-        UpdatedSettings.Connection = GetConnectionSettingsFromUi();
-        Close();
     }
 
     private static bool AllowDigitsOnly(char keyChar)
@@ -344,9 +337,6 @@ public partial class FormSettings : Form
         UpdateSavedCredentialHints();
     }
 
-    private void btnCancel_Click(object sender, EventArgs e)
-        => Close();
-
     private void cmbWidth_KeyPress(object sender, KeyPressEventArgs e)
         => e.Handled = AllowDigitsOnly(e.KeyChar);
 
@@ -375,9 +365,6 @@ public partial class FormSettings : Form
         if (chkSmartSizing.Checked)
             chkAutoResize.Checked = false;
     }
-
-    private void btnConnect_Click(object sender, EventArgs e)
-        => UpdateSettingsAndClose();
 
     private void btnSave_Click(object sender, EventArgs e)
         => SaveSettingsToRdpFile(saveAs: false);
@@ -425,6 +412,29 @@ public partial class FormSettings : Form
 
         RemoveRecent(selectedItem);
         e.Handled = true;
+    }
+
+    private void FormSettings_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        if (DialogResult == DialogResult.Cancel)
+            return;
+
+        var connectionSettings = GetConnectionSettingsFromUi();
+        if (connectionSettings.IsValid())
+        {
+            UpdatedSettings.Connection = GetConnectionSettingsFromUi();
+            return;
+        }
+
+        var validationErrors = connectionSettings.Validate();
+        var errorMessage = $"""
+            The connection settings are invalid for the following reasons:
+
+            {string.Join(Environment.NewLine, validationErrors.Select(err => $"- {err}"))}
+            """;
+
+        MessageBox.Show(this, errorMessage, "Invalid Connection Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        e.Cancel = true;
     }
 
     private enum ScreenModeOption

@@ -260,7 +260,6 @@ public partial class FormRdpClient : Form
         _formSystemMenuService.UpdateZoomCheckmarks(_appSettings.Connection.ScaleFactor);
     }
 
-
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
         var escapeKeyPressed = keyData == Keys.Escape;
