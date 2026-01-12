@@ -44,7 +44,7 @@ function Build-Project([String] $project, [String] $version = "0.0.0") {
 }
 
 function Build-Ui([String] $project, [String] $outputFolder) {
-	Push-Location $project
+    Push-Location $project
 	
 	& npm run lint
 	if(!$?) {
@@ -98,7 +98,7 @@ function Test-Project([String] $project, [String] $version, [String] $filter) {
 }
 
 function Test-Ui([String] $project) {
-	Push-Location $project
+    Push-Location $project
 	
 	Write-Host -ForegroundColor Green "npm run test"
 	& npm run test
@@ -116,7 +116,7 @@ function Test-Ui([String] $project) {
 #region Publish
 #
 
-function Publish-Project([String] $project, [String] $version, [String] $framework, [String] $runtime, [String] $publishFolder, [String] $publishProfile, [String] $password) {
+function Publish-Project([String] $project, [String] $version, [String] $framework, [String] $runtime, [String] $publishFolder, [String] $publishProfile, [String] $password, [String[]] $compilerSwitches) {
     # Configure
 	Create-Private-NuGet-Config
     $fileVersion = Get-FileVersion -version $version
@@ -146,6 +146,11 @@ function Publish-Project([String] $project, [String] $version, [String] $framewo
 
     if ($password) {
         $arguments +=@("-p:Password=""$password""")
+    }
+
+    if ($compilerSwitches) {
+        Write-Host -ForegroundColor Green "Adding compiler switches: $compilerSwitches"
+        $arguments += $compilerSwitches
     }
 
     # Publish project
@@ -193,15 +198,84 @@ function Push-Nuget([String] $publishFolder, [String] $serverUrl, [String] $apiK
     & dotnet nuget push $publishFolder/*.nupkg $arguments
 }
 
-#endregion
+function Publish-Msix([String] $project, [String] $version, [String] $framework, [String] $runtime, [String] $publishFolder) {
+    Publish-Project -project $projectPath -version $version -framework $framework -runtime $runtime -publishFolder $publishFolder -compilerSwitches @("-p:WindowsPackageType=MSIX")
+                                                       
+    $fileVersion = Get-FileVersion -version $version
+    
+    $manifestFile = Join-Path $publishFolder "AppxManifest.xml"
+    $msixVersion = Get-MsixVersion -fileVersion $fileVersion
+    $manifestContent = Get-Content $manifestFile -Encoding UTF8
+    $manifestContent = $manifestContent -replace '(?i)\bVersion\s*=\s*"\d+(?:\.\d+){2,3}"', "Version=""$msixVersion"""
+    [IO.File]::WriteAllLines($manifestFile, $manifestContent)
 
-function Get-FileVersion([String] $version) {
-    return $version -replace '(\d+(?:\.\d+)*)(.*)', '$1'
+    $makeAppxPath = Get-MakeAppxPath
+    $msixOutputPath = "$publishFolder.msix"
+    $makeAppxArgs = @("pack", "/d", $publishFolder, "/p", $msixOutputPath, "/o")
+    & $makeAppxPath $makeAppxArgs
+    if(!$?) {
+        Write-Host -ForegroundColor Red "Error: Failed to create MSIX package."
+        exit $LASTEXITCODE
+    }
+
+    # Clean up temp folder
+    Remove-Item -Path $publishFolder -Recurse -Force
+
+    Write-Host -ForegroundColor Green "MSIX package created: $msixOutputPath"
+    return $msixOutputPath
 }
+
+#endregion
 
 function Create-Private-NuGet-Config {
 	# Copy private configuration holding private repository secrets
 	if ($NUGET_CONFIG) {
 		Copy-Item $NUGET_CONFIG /nuget.config -Force
 	}
+}
+
+function Get-FileVersion([String] $version) {
+    return $version -replace '(\d+(?:\.\d+)*)(.*)', '$1'
+}
+
+function Get-MsixVersion([String] $fileVersion) {
+    
+    # MSIX version format: major.minor.build.revision (4 parts)
+    if ($fileVersion.Split('.').Count -eq 4) {
+        return $fileVersion
+    }
+    
+    $parts = $fileVersion.Split('.')
+    while ($parts.Count -lt 4) {
+        $parts += "0"
+    }
+
+    $msixVersion = $parts -join "."
+    return $msixVersion
+}
+
+function Get-MakeAppxPath {
+    # Find MakeAppx.exe (usually in Windows SDK)
+    $makeAppxPath = $null
+    $sdkPaths = @(
+        "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\makeappx.exe",
+        "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\makeappx.exe",
+        "${env:ProgramFiles}\Windows Kits\10\bin\*\x64\makeappx.exe"
+    )
+    
+    foreach ($path in $sdkPaths) {
+        $found = Get-ChildItem -Path $path -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($found) {
+            $makeAppxPath = $found.FullName
+            break
+        }
+    }
+
+    if (!$makeAppxPath) {
+        Write-Host -ForegroundColor Red "Error: MakeAppx.exe not found. Please install Windows SDK."
+        Write-Host -ForegroundColor Yellow "Download from: https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/"
+        exit 1
+    }
+
+    return $makeAppxPath
 }

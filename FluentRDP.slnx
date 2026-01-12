@@ -4,6 +4,7 @@
     <File Path="Build/scripts/_core.ps1" />
     <File Path="Build/scripts/fluentrdp.build.ps1" />
     <File Path="Build/scripts/fluentrdp.publish.ps1" />
+    <File Path="Build/scripts/fluentrdp.msix.ps1" />
     <File Path="Build/scripts/fluentrdp.test.ps1" />
   </Folder>
   <Folder Name="/Build/targets/">

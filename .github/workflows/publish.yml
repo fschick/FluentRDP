@@ -52,10 +52,10 @@ jobs:
     runs-on: windows-latest
     env:
       RELEASE_VERSION: ${{ github.ref_name }}
-      PUBLISH_FOLDER_SELF_CONTAINED: FluentRDP.${{ github.ref_name }}.self-contained
-      PUBLISH_FOLDER_FRAMEWORK_DEPENDENT: FluentRDP.${{ github.ref_name }}.framework-dependent
-      ZIP_FILENAME_SELF_CONTAINED: FluentRDP.${{ github.ref_name }}.self-contained.zip
-      ZIP_FILENAME_FRAMEWORK_DEPENDENT: FluentRDP.${{ github.ref_name }}.framework-dependent.zip
+      PUBLISH_FOLDER_PORTABLE_SELF_CONTAINED: FluentRDP.${{ github.ref_name }}.self-contained-portable
+      PUBLISH_FOLDER_PORTABLE_FRAMEWORK_DEPENDENT: FluentRDP.${{ github.ref_name }}.framework-dependent-portable
+      ZIP_FILENAME_SELF_CONTAINED: FluentRDP.${{ github.ref_name }}.self-contained.portable.zip
+      ZIP_FILENAME_FRAMEWORK_DEPENDENT: FluentRDP.${{ github.ref_name }}framework-dependent.portable.zip
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -65,22 +65,22 @@ jobs:
         dotnet-version: 10.0.x
     - name: Publish Self-Contained
       shell: pwsh
-      run: Build/scripts/fluentrdp.publish.ps1 -version ${{ env.RELEASE_VERSION }} -runtime win-x64 -publishFolder ${{ env.PUBLISH_FOLDER_SELF_CONTAINED }}
+      run: Build/scripts/fluentrdp.publish.portable.ps1 -version ${{ env.RELEASE_VERSION }} -runtime win-x64 -publishFolder ${{ env.PUBLISH_FOLDER_PORTABLE_SELF_CONTAINED }}
     - name: Publish Framework-Dependent
       shell: pwsh
-      run: Build/scripts/fluentrdp.publish.ps1 -version ${{ env.RELEASE_VERSION }} -publishFolder ${{ env.PUBLISH_FOLDER_FRAMEWORK_DEPENDENT }}
+      run: Build/scripts/fluentrdp.publish.portable.ps1 -version ${{ env.RELEASE_VERSION }} -publishFolder ${{ env.PUBLISH_FOLDER_PORTABLE_FRAMEWORK_DEPENDENT }}
     - name: Create Self-Contained release artifact
       uses: thedoctor0/zip-release@0.7.5
       with:
         type: 'zip'
         filename: ${{ env.ZIP_FILENAME_SELF_CONTAINED }}
-        path: ${{ env.PUBLISH_FOLDER_SELF_CONTAINED }}
+        path: ${{ env.PUBLISH_FOLDER_PORTABLE_SELF_CONTAINED }}
     - name: Create Framework-Dependent release artifact
       uses: thedoctor0/zip-release@0.7.5
       with:
         type: 'zip'
         filename: ${{ env.ZIP_FILENAME_FRAMEWORK_DEPENDENT }}
-        path: ${{ env.PUBLISH_FOLDER_FRAMEWORK_DEPENDENT }}
+        path: ${{ env.PUBLISH_FOLDER_PORTABLE_FRAMEWORK_DEPENDENT }}
     - name: Upload release artifacts
       uses: softprops/action-gh-release@v2
       with:

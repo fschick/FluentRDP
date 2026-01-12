@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="../Build/targets/net_core.props" />
 	<Import Project="../Build/targets/version.props" />
-	
+
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<UseWindowsForms>true</UseWindowsForms>
@@ -34,6 +34,18 @@
 		<Delete Files="@(InteropDlls)" ContinueOnError="true" />
 		<Message Text="Cleaned RDP COM interop assemblies" Importance="normal" />
 	</Target>
+
+	<!-- MSIX Packaging -->
+	<ItemGroup Condition="'$(WindowsPackageType)' == 'MSIX'">
+		<AppxManifest Include="FluentRDP.appxmanifest" />
+		<None Update="FluentRDP.appxmanifest">
+			<Link>AppxManifest.xml</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Assets\MSIX\*.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<Reference Include="AxMSTSCLib">
