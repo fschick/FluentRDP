@@ -153,6 +153,7 @@ namespace FluentRDP.UI
             Name = "FormRdpClient";
             Text = "FluentRDP";
             FormClosing += FormRdpClient_FormClosing;
+            FormClosed += FormRdpClient_FormClosed;
             Shown += FormRdpClient_Shown;
             panelRdp.ResumeLayout(false);
             panelStartup.ResumeLayout(false);

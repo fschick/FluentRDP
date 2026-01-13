@@ -395,4 +395,7 @@ public partial class FormRdpClient : Form
 
     private void btnCancel_Click(object sender, EventArgs e)
         => Disconnect();
+
+    private void FormRdpClient_FormClosed(object sender, FormClosedEventArgs e)
+        => Application.Exit();
 }
