@@ -6,6 +6,8 @@ using FluentRDP.Services;
 using Mono.Options;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace FluentRDP.CommandLine;
@@ -143,6 +145,8 @@ internal class CommandLineOptions
                 v => settings.Connection.ScreenMode = v != null ? ScreenMode.FullScreen : null },
             { "all-monitors|multi-monitor|multimon", "Use all monitors for the remote desktop session (span across all monitors)",
                 v => settings.Connection.UseAllMonitors = v != null ? true: null },
+            { "badge-color|badgecolor=", "Window icon badge color override. Supports named colors or hex RGB/ARGB",
+                v => settings.Connection.BadgeColor = ParseBadgeColor(v) },
 
             // Experience options
             { "show-connection-bar|display-connection-bar", "Display connection bar in fullscreen mode",
@@ -209,6 +213,33 @@ internal class CommandLineOptions
         settings.Connection.Username = username;
         if (domain != null)
             settings.Connection.Domain = domain;
+    }
+
+    private static Color? ParseBadgeColor(string? value)
+    {
+        try
+        {
+            var colorMatch = Regex.Match(value ?? string.Empty, @"#?((?<hex>[\dA-Fa-f]{8}|[\dA-Fa-f]{6})|(?<name>\w+))");
+            if (!colorMatch.Success)
+                return null;
+
+            var hexValue = colorMatch.Groups["hex"].Value;
+            if (hexValue.Length > 0)
+                return $"#{hexValue}".ToColor();
+
+            var colorName = colorMatch.Groups["name"].Value;
+            if (colorName.Length > 0)
+                return colorName.ToColor();
+
+            return null;
+        }
+        catch (ArgumentException)
+        {
+            throw new OptionException(
+                $"Invalid badge color: {value}. Use a named color (Color.FromName) or a hex value (RRGGBB or AARRGGBB) with optional leading '#'. Examples: Red, #FF0000, 00FF00, #80FF0000",
+                "badge-color"
+            );
+        }
     }
 
     /// <summary>
@@ -389,6 +420,7 @@ internal class CommandLineOptions
                 --no-auto-resize                Disable auto-resize on window resize
                 -f, --fullscreen                Start in fullscreen mode
                 --all-monitors, --multimon      Use all monitors (span across monitors)
+                --badge-color <color>           Icon badge color override (Color.FromName or hex RRGGBB/AARRGGBB, optional '#')
 
             Experience:
                 --show-connection-bar           Show connection bar in fullscreen

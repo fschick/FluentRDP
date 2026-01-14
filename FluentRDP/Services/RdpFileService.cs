@@ -4,6 +4,7 @@ using FluentRDP.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -126,7 +127,7 @@ internal static class RdpFileService
     {
         var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
 
-        if (underlyingType == typeof(string))
+        if (underlyingType == typeof(string) || underlyingType == typeof(Color))
             return RdpPropertyType.STRING;
         if (underlyingType == typeof(bool) || underlyingType == typeof(int) ||
             underlyingType == typeof(uint) || underlyingType.IsEnum)

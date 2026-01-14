@@ -6,6 +6,9 @@ using System.Text.RegularExpressions;
 
 namespace FluentRDP.Extensions;
 
+/// <summary>
+/// Extensions methods for type <see cref="string"></see>
+/// </summary>
 internal static partial class StringExtensions
 {
     public static bool IsValidHostname([NotNullWhen(true)] this string? ipaddressOrHostname)
@@ -103,6 +106,22 @@ internal static partial class StringExtensions
             return username;
 
         return $"{domain}\\{username}";
+    }
+
+    public static int Fnv1A32(this string input)
+    {
+        unchecked
+        {
+            const uint offset = 2166136261;
+            const uint prime = 16777619;
+            var hash = offset;
+            foreach (var character in input)
+            {
+                hash ^= character;
+                hash *= prime;
+            }
+            return (int)hash;
+        }
     }
 
     /// <summary>

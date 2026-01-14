@@ -1,8 +1,10 @@
 ﻿using FluentRDP.Attributes;
 using FluentRDP.Configuration;
+using FluentRDP.Extensions;
 using FluentRDP.Models;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 
@@ -43,6 +45,8 @@ internal static class SettingsToRdpFileService
             return int.Parse(rdpValue);
         if (underlyingTargetType == typeof(uint))
             return uint.Parse(rdpValue);
+        if (underlyingTargetType == typeof(Color))
+            return rdpValue.ToColor();
         if (underlyingTargetType.IsEnum)
             return Enum.ToObject(underlyingTargetType, int.Parse(rdpValue));
 
@@ -63,6 +67,8 @@ internal static class SettingsToRdpFileService
             return (bool)value ? "1" : "0";
         if (underlyingValueType == typeof(int) || underlyingValueType == typeof(uint))
             return value.ToString();
+        if (underlyingValueType == typeof(Color))
+            return ((Color)value).ToColorString();
         if (underlyingValueType.IsEnum)
             return ((int)value).ToString();
 

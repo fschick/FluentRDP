@@ -5,6 +5,7 @@ using FluentRDP.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Drawing;
 using System.Linq;
 
 namespace FluentRDP.Configuration;
@@ -227,6 +228,15 @@ internal class ConnectionSettings
     #region Fluent RDP specific settings (non-standard)
     [NotMapped]
     public DateTime LastConnected { get; set; }
+
+    /// <summary>
+    /// Gets or sets a color override for the window icon badge.
+    /// Allowed values are either a named color (parsed by <see cref="Color.FromName(string)"/>)
+    /// or a hex value in the form RRGGBB or AARRGGBB (optional leading '#').
+    /// Examples: "Red", "#FF0000", "00FF00", "#80FF0000"
+    /// </summary>
+    [RdpFile("fluent rdp badge color")]
+    public Color? BadgeColor { get; set; }
     #endregion Fluent RDP specific settings (non-standard)
 
     public ConnectionSettings Clone()

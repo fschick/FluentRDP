@@ -254,6 +254,14 @@ public partial class FormRdpClient : Form
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
 
+    private void SetBadgeIcon()
+    {
+        const int size = 14;
+        var x = Properties.Resources.AppIcon.Size.Width - size;
+        var color = _appSettings.Connection.BadgeColor;
+        Icon = _appSettings.Connection.Hostname.GenerateBadgeIcon(x, y: 0, size, size, color);
+    }
+
     /// <summary>
     /// Called after the form handle has been created
     /// </summary>
@@ -329,6 +337,7 @@ public partial class FormRdpClient : Form
             _formResizeDetectionService.Dispose();
             _formSizeEnforcementService.Dispose();
             _formSystemMenuService.Dispose();
+
             components?.Dispose();
         }
 
@@ -338,6 +347,7 @@ public partial class FormRdpClient : Form
     private void RdpService_Connected(object? sender, EventArgs e)
     {
         HideConnectingMessage();
+        SetBadgeIcon();
         _formSystemMenuService.EnableMenuItem(Interop.SC_FULLSCREEN, true);
         RecentConnectionsService.AddOrUpdate(_appSettings.Connection);
     }
@@ -352,6 +362,13 @@ public partial class FormRdpClient : Form
 
         HideConnectingMessage();
         ShowDisconnectStatus(e);
+
+        var originalIcon = Properties.Resources.AppIcon;
+        if (Icon != originalIcon)
+        {
+            Icon?.Dispose();
+            Icon = originalIcon;
+        }
 
         var closeOnDisconnect = _appSettings.NoCloseOnDisconnect != true;
         var closeNotSuppressed = !ModifierKeys.HasFlag(Keys.Shift);

@@ -85,9 +85,9 @@ internal static class Interop
     public const int ATTACH_PARENT_PROCESS = -1;
 
     // Credential Persistence Constants
-    internal const int CRED_PERSIST_SESSION = 1;
-    internal const int CRED_PERSIST_LOCAL_MACHINE = 2;
-    internal const int CRED_PERSIST_ENTERPRISE = 3;
+    public const int CRED_PERSIST_SESSION = 1;
+    public const int CRED_PERSIST_LOCAL_MACHINE = 2;
+    public const int CRED_PERSIST_ENTERPRISE = 3;
 
     private static readonly IEnumerable<Size> _commonResolutions = [
         new(1920, 1080),
@@ -120,8 +120,8 @@ internal static class Interop
         else
         {
             var modeNum = 0;
-            var deviceMode = new Interop.DEVMODE();
-            while (Interop.EnumDisplaySettings(null, modeNum, ref deviceMode))
+            var deviceMode = new DEVMODE();
+            while (EnumDisplaySettings(null, modeNum, ref deviceMode))
             {
                 if (deviceMode is { dmPelsWidth: > 0, dmPelsHeight: > 0 })
                     resolutions.Add(new Size(deviceMode.dmPelsWidth, deviceMode.dmPelsHeight));
@@ -174,19 +174,22 @@ internal static class Interop
 
     // P/Invoke Methods - Advapi32.dll (Credential Manager)
     [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern bool CredRead(string targetName, CredentialType type, int reservedFlag, out IntPtr credentialPtr);
+    public static extern bool CredRead(string targetName, CredentialType type, int reservedFlag, out IntPtr credentialPtr);
 
     [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern bool CredWrite(IntPtr credential, int flags);
+    public static extern bool CredWrite(IntPtr credential, int flags);
 
     [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern bool CredDelete(string targetName, CredentialType type, int reservedFlag);
+    public static extern bool CredDelete(string targetName, CredentialType type, int reservedFlag);
 
     [DllImport("advapi32.dll", SetLastError = true)]
-    internal static extern bool CredFree(IntPtr credential);
+    public static extern bool CredFree(IntPtr credential);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern bool DestroyIcon(IntPtr handle);
 
     // Enums
-    internal enum CredentialType
+    public enum CredentialType
     {
         Generic = 1,
         DomainPassword = 2,
@@ -258,7 +261,7 @@ internal static class Interop
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct CREDENTIAL
+    public struct CREDENTIAL
     {
         public int Flags;
         public int Type;
