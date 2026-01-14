@@ -201,8 +201,7 @@ internal sealed class RdpClientService : IDisposable
         Debug.Assert(_connectionSettings is not null);
         Debug.Assert(_rdpClient is not null);
 
-        var useAllMonitors = _connectionSettings.UseAllMonitors == true;
-        var fixedSize = useAllMonitors || _connectionSettings.AutoResize == false;
+        var fixedSize = _connectionSettings.AutoResize == false;
         var extendedSettings = (IMsRdpExtendedSettings)_rdpClient;
 
         #region Connection options
@@ -258,7 +257,7 @@ internal sealed class RdpClientService : IDisposable
         if (_connectionSettings.SmartSizing != null)
             _rdpClient.AdvancedSettings9.SmartSizing = _connectionSettings.SmartSizing.Value;
 
-        ((IMsRdpClientNonScriptable5)_rdpClient).UseMultimon = useAllMonitors;
+        ((IMsRdpClientNonScriptable5)_rdpClient).UseMultimon = _connectionSettings.UseAllMonitors == true;
 
         if (_connectionSettings.EnableCompression != null)
             _rdpClient.AdvancedSettings9.Compress = 1;
