@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace FluentRDP.Extensions;
@@ -15,6 +16,22 @@ internal static class ColorExtensions
         var converter = TypeDescriptor.GetConverter(typeof(Color));
         var result = (Color?)(converter.ConvertFromString(colorStr) ?? null);
         return result;
+    }
+
+    /// <summary>Parse color named color or hex string.</summary>
+    /// <param name="colorStr">Color string.</param>
+    public static Color? TryToColor(this string colorStr)
+    {
+        try
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(Color));
+            var result = (Color?)(converter.ConvertFromString(colorStr) ?? null);
+            return result;
+        }
+        catch (ArgumentException)
+        {
+            return null;
+        }
     }
 
     /// <summary>Converts a color to named color or hex string.</summary>

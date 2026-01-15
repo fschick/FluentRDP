@@ -15,7 +15,7 @@ internal static class BadgeColorService
     private static readonly Color _iconGreenEnd = ColorTranslator.FromHtml("#648A00");
     private static readonly Color _iconGreenMid = BlendRgb(_iconGreenStart, _iconGreenEnd, 0.5f);
 
-    private static readonly Color[] _palette = BuildDistinctBadgePalette(DEFAULT_PALETTE_SIZE);
+    public static readonly Color[] Palette = BuildDistinctBadgePalette(DEFAULT_PALETTE_SIZE);
 
     public static Icon GenerateBadgeIcon(this string? hostname, int x, int y, int width, int height, Color? color)
     {
@@ -73,11 +73,11 @@ internal static class BadgeColorService
     private static Color GetBadgeColor(string? hostname)
     {
         if (string.IsNullOrWhiteSpace(hostname))
-            return _palette[0];
+            return Palette[0];
 
         var hash = hostname.Trim().ToLowerInvariant().Fnv1A32();
-        var idx = (int)((uint)hash % (uint)_palette.Length);
-        return _palette[idx];
+        var idx = (int)((uint)hash % (uint)Palette.Length);
+        return Palette[idx];
     }
 
     private static GraphicsPath CreateRoundedRectanglePath(Rectangle rect, int radius)

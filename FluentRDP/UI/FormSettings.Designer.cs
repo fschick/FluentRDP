@@ -74,8 +74,12 @@ namespace FluentRDP.UI
             btnSave = new System.Windows.Forms.Button();
             btnCancel = new System.Windows.Forms.Button();
             grpExperience = new System.Windows.Forms.GroupBox();
+            tbBadgeColor = new System.Windows.Forms.TextBox();
+            panelBadgeColor = new System.Windows.Forms.Panel();
+            comboBox1 = new System.Windows.Forms.ComboBox();
             chkPinConnectionBar = new System.Windows.Forms.CheckBox();
             chkDisplayConnectionBar = new System.Windows.Forms.CheckBox();
+            lbBadgeColor = new System.Windows.Forms.Label();
             btnConnect = new System.Windows.Forms.Button();
             grpServerAuthentication.SuspendLayout();
             grpRedirection.SuspendLayout();
@@ -158,9 +162,9 @@ namespace FluentRDP.UI
             // 
             grpServerAuthentication.Controls.Add(lblAuthenticationLevel);
             grpServerAuthentication.Controls.Add(cmbAuthenticationLevel);
-            grpServerAuthentication.Location = new System.Drawing.Point(349, 310);
+            grpServerAuthentication.Location = new System.Drawing.Point(349, 338);
             grpServerAuthentication.Name = "grpServerAuthentication";
-            grpServerAuthentication.Size = new System.Drawing.Size(326, 85);
+            grpServerAuthentication.Size = new System.Drawing.Size(326, 61);
             grpServerAuthentication.TabIndex = 4;
             grpServerAuthentication.TabStop = false;
             grpServerAuthentication.Text = "Server authentication";
@@ -198,7 +202,7 @@ namespace FluentRDP.UI
             grpRedirection.Controls.Add(lblKeyboardMode);
             grpRedirection.Location = new System.Drawing.Point(10, 179);
             grpRedirection.Name = "grpRedirection";
-            grpRedirection.Size = new System.Drawing.Size(326, 216);
+            grpRedirection.Size = new System.Drawing.Size(326, 220);
             grpRedirection.TabIndex = 1;
             grpRedirection.TabStop = false;
             grpRedirection.Text = "Redirection";
@@ -518,7 +522,7 @@ namespace FluentRDP.UI
             // btnSaveAs
             // 
             btnSaveAs.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            btnSaveAs.Location = new System.Drawing.Point(12, 409);
+            btnSaveAs.Location = new System.Drawing.Point(12, 410);
             btnSaveAs.Name = "btnSaveAs";
             btnSaveAs.Size = new System.Drawing.Size(91, 23);
             btnSaveAs.TabIndex = 7;
@@ -529,7 +533,7 @@ namespace FluentRDP.UI
             // btnSave
             // 
             btnSave.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            btnSave.Location = new System.Drawing.Point(111, 409);
+            btnSave.Location = new System.Drawing.Point(111, 410);
             btnSave.Name = "btnSave";
             btnSave.Size = new System.Drawing.Size(75, 23);
             btnSave.TabIndex = 8;
@@ -541,7 +545,7 @@ namespace FluentRDP.UI
             // 
             btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            btnCancel.Location = new System.Drawing.Point(600, 409);
+            btnCancel.Location = new System.Drawing.Point(600, 410);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new System.Drawing.Size(75, 23);
             btnCancel.TabIndex = 6;
@@ -550,40 +554,78 @@ namespace FluentRDP.UI
             // 
             // grpExperience
             // 
+            grpExperience.Controls.Add(tbBadgeColor);
+            grpExperience.Controls.Add(panelBadgeColor);
+            grpExperience.Controls.Add(comboBox1);
             grpExperience.Controls.Add(chkPinConnectionBar);
             grpExperience.Controls.Add(chkDisplayConnectionBar);
+            grpExperience.Controls.Add(lbBadgeColor);
             grpExperience.Location = new System.Drawing.Point(349, 230);
             grpExperience.Name = "grpExperience";
-            grpExperience.Size = new System.Drawing.Size(326, 74);
+            grpExperience.Size = new System.Drawing.Size(326, 102);
             grpExperience.TabIndex = 3;
             grpExperience.TabStop = false;
             grpExperience.Text = "Experience";
             // 
+            // tbBadgeColor
+            // 
+            tbBadgeColor.Location = new System.Drawing.Point(123, 22);
+            tbBadgeColor.Name = "tbBadgeColor";
+            tbBadgeColor.Size = new System.Drawing.Size(85, 23);
+            tbBadgeColor.TabIndex = 1;
+            tbBadgeColor.TextChanged += tbBadgeColor_TextChanged;
+            // 
+            // panelBadgeColor
+            // 
+            panelBadgeColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            panelBadgeColor.Location = new System.Drawing.Point(228, 22);
+            panelBadgeColor.Name = "panelBadgeColor";
+            panelBadgeColor.Size = new System.Drawing.Size(85, 23);
+            panelBadgeColor.TabIndex = 2;
+            panelBadgeColor.Click += panelBadgeColor_Click;
+            // 
+            // comboBox1
+            // 
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new System.Drawing.Point(123, 22);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new System.Drawing.Size(85, 23);
+            comboBox1.TabIndex = 8;
+            // 
             // chkPinConnectionBar
             // 
             chkPinConnectionBar.AutoSize = true;
-            chkPinConnectionBar.Location = new System.Drawing.Point(8, 47);
+            chkPinConnectionBar.Location = new System.Drawing.Point(8, 76);
             chkPinConnectionBar.Name = "chkPinConnectionBar";
             chkPinConnectionBar.Size = new System.Drawing.Size(126, 19);
-            chkPinConnectionBar.TabIndex = 1;
+            chkPinConnectionBar.TabIndex = 4;
             chkPinConnectionBar.Text = "Pin connection bar";
             chkPinConnectionBar.UseVisualStyleBackColor = true;
             // 
             // chkDisplayConnectionBar
             // 
             chkDisplayConnectionBar.AutoSize = true;
-            chkDisplayConnectionBar.Location = new System.Drawing.Point(8, 22);
+            chkDisplayConnectionBar.Location = new System.Drawing.Point(8, 51);
             chkDisplayConnectionBar.Name = "chkDisplayConnectionBar";
             chkDisplayConnectionBar.Size = new System.Drawing.Size(147, 19);
-            chkDisplayConnectionBar.TabIndex = 0;
+            chkDisplayConnectionBar.TabIndex = 3;
             chkDisplayConnectionBar.Text = "Display connection bar";
             chkDisplayConnectionBar.UseVisualStyleBackColor = true;
+            // 
+            // lbBadgeColor
+            // 
+            lbBadgeColor.AutoSize = true;
+            lbBadgeColor.Location = new System.Drawing.Point(6, 25);
+            lbBadgeColor.Name = "lbBadgeColor";
+            lbBadgeColor.Size = new System.Drawing.Size(73, 15);
+            lbBadgeColor.TabIndex = 0;
+            lbBadgeColor.Text = "Badge color:";
             // 
             // btnConnect
             // 
             btnConnect.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             btnConnect.DialogResult = System.Windows.Forms.DialogResult.OK;
-            btnConnect.Location = new System.Drawing.Point(519, 409);
+            btnConnect.Location = new System.Drawing.Point(519, 410);
             btnConnect.Name = "btnConnect";
             btnConnect.Size = new System.Drawing.Size(75, 23);
             btnConnect.TabIndex = 5;
@@ -596,7 +638,7 @@ namespace FluentRDP.UI
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             CancelButton = btnCancel;
-            ClientSize = new System.Drawing.Size(689, 444);
+            ClientSize = new System.Drawing.Size(689, 445);
             Controls.Add(btnConnect);
             Controls.Add(grpExperience);
             Controls.Add(btnSaveAs);
@@ -677,5 +719,9 @@ namespace FluentRDP.UI
         private System.Windows.Forms.Label lbCredentials;
         private System.Windows.Forms.ComboBox cmbHostname;
         private System.Windows.Forms.ComboBox cmbUsername;
+        private System.Windows.Forms.Label lbBadgeColor;
+        private System.Windows.Forms.Panel panelBadgeColor;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.TextBox tbBadgeColor;
     }
 }

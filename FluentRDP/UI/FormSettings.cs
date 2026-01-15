@@ -3,6 +3,7 @@ using FluentRDP.Configuration.Enums;
 using FluentRDP.Extensions;
 using FluentRDP.Platform;
 using FluentRDP.Services;
+using FluentRDP.UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -137,6 +138,7 @@ public partial class FormSettings : Form
 
         chkDisplayConnectionBar.CheckState = GetCheckState(settings.DisplayConnectionBar);
         chkPinConnectionBar.CheckState = GetCheckState(settings.PinConnectionBar);
+        tbBadgeColor.Text = settings.BadgeColor?.ToColorString() ?? string.Empty;
 
         SetComboBoxValue(cmbAuthenticationLevel, settings.AuthenticationLevel);
     }
@@ -176,6 +178,7 @@ public partial class FormSettings : Form
 
         updatedConnectionSettings.DisplayConnectionBar = GetBoolValue(chkDisplayConnectionBar.CheckState);
         updatedConnectionSettings.PinConnectionBar = GetBoolValue(chkPinConnectionBar.CheckState);
+        updatedConnectionSettings.BadgeColor = string.IsNullOrWhiteSpace(tbBadgeColor.Text) ? null : tbBadgeColor.Text.ToColor();
 
         updatedConnectionSettings.AuthenticationLevel = GetComboBoxValue<AuthenticationLevel?>(cmbAuthenticationLevel);
 
@@ -337,6 +340,19 @@ public partial class FormSettings : Form
         UpdateSavedCredentialHints();
     }
 
+    private void ChangeColor()
+    {
+        using var colorDialog = new ColorDialog();
+        colorDialog.Color = panelBadgeColor.BackColor;
+        var palette = BadgeColorService.Palette.Select(color => color.R | (color.G << 8) | (color.B << 16)).ToArray();
+        colorDialog.CustomColors = palette;
+        if (colorDialog.ShowDialog() != DialogResult.OK)
+            return;
+
+        panelBadgeColor.BackColor = colorDialog.Color;
+        tbBadgeColor.Text = panelBadgeColor.BackColor.ToColorString();
+    }
+
     private void cmbWidth_KeyPress(object sender, KeyPressEventArgs e)
         => e.Handled = AllowDigitsOnly(e.KeyChar);
 
@@ -435,6 +451,15 @@ public partial class FormSettings : Form
 
         MessageBox.Show(this, errorMessage, "Invalid Connection Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         e.Cancel = true;
+    }
+
+    private void panelBadgeColor_Click(object sender, EventArgs e)
+        => ChangeColor();
+
+    private void tbBadgeColor_TextChanged(object sender, EventArgs e)
+    {
+        var color = tbBadgeColor.Text.TryToColor();
+        panelBadgeColor.BackColor = color ?? SystemColors.Window;
     }
 
     private enum ScreenModeOption
