@@ -198,6 +198,37 @@ function Push-Nuget([String] $publishFolder, [String] $serverUrl, [String] $apiK
     & dotnet nuget push $publishFolder/*.nupkg $arguments
 }
 
+function Publish-Msi([String] $project, [String] $version, [String] $framework, [String] $runtime, [String] $publishFolder, [String] $installerProject = $null) {
+    # Publish project
+    Publish-Project -project $project -version $version -framework $framework -runtime $runtime -publishFolder $publishFolder
+    
+    if (-not $installerProject) {
+        $p = Resolve-Path $project 
+        $projectPath = Resolve-Path $project | Select-Object -ExpandProperty Path | Split-Path -Leaf
+        $installerProject = "${projectPath}.Installer"
+    }
+    
+    # Publish installer project
+    Write-Host -ForegroundColor Green "dotnet build $installerProject --configuration Release -p:WixSharpBuild=false"
+    & dotnet build $installerProject --configuration Release -p:WixSharpBuild=false
+    if(!$?) {
+        exit $LASTEXITCODE
+    }
+
+    # Excecute installer to build MSI
+    $installerExe = Join-Path $installerProject "bin\Release\net48\${installerProject}.exe"
+    $fileVersion = Get-FileVersion -version $version
+    $msiOutputPath = "${publishFolder}.msi"
+    
+    Write-Host -ForegroundColor Green "$installerExe -version "$fileVersion" -publish-folder "$publishFolder" -output "$msiOutputPath""
+    & $installerExe -version "$fileVersion" -publish-folder "$publishFolder" -output "$msiOutputPath"
+    if(!$?) {
+        exit $LASTEXITCODE
+    }
+    
+    return $msiOutputPath
+}
+
 function Publish-Msix([String] $project, [String] $version, [String] $framework, [String] $runtime, [String] $publishFolder) {
     Publish-Project -project $projectPath -version $version -framework $framework -runtime $runtime -publishFolder $publishFolder -compilerSwitches @("-p:WindowsPackageType=MSIX")
                                                        
@@ -214,7 +245,6 @@ function Publish-Msix([String] $project, [String] $version, [String] $framework,
     $makeAppxArgs = @("pack", "/d", $publishFolder, "/p", $msixOutputPath, "/o")
     & $makeAppxPath $makeAppxArgs
     if(!$?) {
-        Write-Host -ForegroundColor Red "Error: Failed to create MSIX package."
         exit $LASTEXITCODE
     }
 

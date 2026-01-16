@@ -2,7 +2,7 @@
 
 param (
   [Parameter(Mandatory=$true)][String]$version,
-  [Parameter(Mandatory=$false)][String]$runtime = "win-x64",
+  [Parameter(Mandatory=$false)][String]$runtime,
   [Parameter(Mandatory=$false)][String]$publishFolder
 )
 

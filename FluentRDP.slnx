@@ -11,5 +11,6 @@
     <File Path="Build/targets/net_core.props" />
     <File Path="Build/targets/version.props" />
   </Folder>
+  <Project Path="FluentRDP.Installer/FluentRDP.Installer.csproj" />
   <Project Path="FluentRDP/FluentRDP.csproj" />
 </Solution>

@@ -1,4 +1,4 @@
-# FluentRDP
+# Fluent RDP
 
 Modern RDP client with live window resizing and zoom (by DPI). Drop-in replacement for `mstsc.exe`.
 
@@ -15,19 +15,33 @@ Modern RDP client with live window resizing and zoom (by DPI). Drop-in replaceme
 ### Requirements
 
 - Windows 11, might work under other Windows versions but untested
-- .NET 10.0 Runtime (for framework-dependent builds)
+- .NET 10.0 Runtime (only required for standard versions, not for Full versions)
 - Microsoft RDP ActiveX Control (MSTSCLib) - included with Windows
 
 ### Pre-built Releases
 
-Download the latest release from the [Releases](https://github.com/fschick/FluentRDP/releases) page:
+Download the latest release from the [Releases](https://github.com/fschick/FluentRDP/releases) page. Choose the version that best fits your needs:
 
-- **Self-Contained**: Includes .NET runtime (larger download, no installation required)
-- **Framework-Dependent**: Requires .NET 10.0 runtime installed (smaller download)
+#### Installer Versions (MSI)
 
-Extract the ZIP file and run `FluentRDP.exe`.
+- **`FluentRDP-X.X.X-FullSetup.msi`** - Full installer with .NET runtime included
+  
+- **`FluentRDP-X.X.X-Setup.msi`** - Standard installer (requires .NET 10.0)
 
-### Usage
+#### Portable Versions (ZIP)
+
+- **`FluentRDP-X.X.X-Full.zip`** - Portable version with .NET runtime included
+  
+- **`FluentRDP-X.X.X.zip`** - Standard portable version (requires .NET 10.0)
+
+**Which version should I choose?**
+
+- If you're unsure or don't have .NET installed: Choose the **Full** version (either MSI or ZIP)
+- If you already have .NET 10.0 installed: Choose the standard version to save download size
+- For easy installation: Use the **MSI** installer
+- For portable use: Use the **ZIP** archive
+
+## Usage
 
 For command-line options and usage information, run:
 

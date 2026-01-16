@@ -11,7 +11,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Include="FluentRDP.ico" />
+		<Content Include="FluentRDP.ico">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -20,9 +22,7 @@
 
 	<!-- Generate RDP COM interop assemblies if they don't exist -->
 	<Target Name="GenerateRdpInterop" BeforeTargets="BeforeBuild" Condition="!Exists('$(MSBuildThisFileDirectory)Platform\AxMSTSCLib.dll') Or !Exists('$(MSBuildThisFileDirectory)Platform\MSTSCLib.dll')">
-		<Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\Build\scripts\fluentrdp.generate-rdp-interop.ps1&quot; -OutputPath &quot;$(MSBuildThisFileDirectory)Platform&quot;" 
-			  ContinueOnError="false" 
-			  IgnoreExitCode="false" />
+		<Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\Build\scripts\fluentrdp.generate-rdp-interop.ps1&quot; -OutputPath &quot;$(MSBuildThisFileDirectory)Platform&quot;" ContinueOnError="false" IgnoreExitCode="false" />
 	</Target>
 
 	<!-- Clean up generated RDP COM interop assemblies when cleaning -->

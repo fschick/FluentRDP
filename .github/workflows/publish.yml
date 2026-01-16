@@ -47,15 +47,13 @@ jobs:
         retention-days: 10
       if: ${{ always() }}
   
-  publish:
+  publish-portable-self-contained:
     needs: [build, test]
     runs-on: windows-latest
     env:
       RELEASE_VERSION: ${{ github.ref_name }}
-      PUBLISH_FOLDER_PORTABLE_SELF_CONTAINED: FluentRDP.${{ github.ref_name }}.self-contained-portable
-      PUBLISH_FOLDER_PORTABLE_FRAMEWORK_DEPENDENT: FluentRDP.${{ github.ref_name }}.framework-dependent-portable
-      ZIP_FILENAME_SELF_CONTAINED: FluentRDP.${{ github.ref_name }}.self-contained.portable.zip
-      ZIP_FILENAME_FRAMEWORK_DEPENDENT: FluentRDP.${{ github.ref_name }}framework-dependent.portable.zip
+      PUBLISH_FOLDER: FluentRDP.${{ github.ref_name }}
+      ZIP_FILENAME: FluentRDP.${{ github.ref_name }}-full.zip
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -65,25 +63,86 @@ jobs:
         dotnet-version: 10.0.x
     - name: Publish Self-Contained
       shell: pwsh
-      run: Build/scripts/fluentrdp.publish.portable.ps1 -version ${{ env.RELEASE_VERSION }} -runtime win-x64 -publishFolder ${{ env.PUBLISH_FOLDER_PORTABLE_SELF_CONTAINED }}
-    - name: Publish Framework-Dependent
-      shell: pwsh
-      run: Build/scripts/fluentrdp.publish.portable.ps1 -version ${{ env.RELEASE_VERSION }} -publishFolder ${{ env.PUBLISH_FOLDER_PORTABLE_FRAMEWORK_DEPENDENT }}
-    - name: Create Self-Contained release artifact
+      run: Build/scripts/fluentrdp.publish.portable.ps1 -version ${{ env.RELEASE_VERSION }} -runtime win-x64 -publishFolder ${{ env.PUBLISH_FOLDER }}
+    - name: Create release artifact
       uses: thedoctor0/zip-release@0.7.5
       with:
         type: 'zip'
-        filename: ${{ env.ZIP_FILENAME_SELF_CONTAINED }}
-        path: ${{ env.PUBLISH_FOLDER_PORTABLE_SELF_CONTAINED }}
-    - name: Create Framework-Dependent release artifact
-      uses: thedoctor0/zip-release@0.7.5
-      with:
-        type: 'zip'
-        filename: ${{ env.ZIP_FILENAME_FRAMEWORK_DEPENDENT }}
-        path: ${{ env.PUBLISH_FOLDER_PORTABLE_FRAMEWORK_DEPENDENT }}
-    - name: Upload release artifacts
+        filename: ${{ env.ZIP_FILENAME }}
+        path: ${{ env.PUBLISH_FOLDER }}
+    - name: Upload release artifact
       uses: softprops/action-gh-release@v2
       with:
-        files: |
-          ${{ env.ZIP_FILENAME_SELF_CONTAINED }}
-          ${{ env.ZIP_FILENAME_FRAMEWORK_DEPENDENT }}
+        files: ${{ env.ZIP_FILENAME }}
+
+  publish-portable-framework-dependent:
+    needs: [build, test]
+    runs-on: windows-latest
+    env:
+      RELEASE_VERSION: ${{ github.ref_name }}
+      PUBLISH_FOLDER: FluentRDP.${{ github.ref_name }}
+      ZIP_FILENAME: FluentRDP.${{ github.ref_name }}.zip
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Publish Framework-Dependent
+      shell: pwsh
+      run: Build/scripts/fluentrdp.publish.portable.ps1 -version ${{ env.RELEASE_VERSION }} -publishFolder ${{ env.PUBLISH_FOLDER }}
+    - name: Create release artifact
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: 'zip'
+        filename: ${{ env.ZIP_FILENAME }}
+        path: ${{ env.PUBLISH_FOLDER }}
+    - name: Upload release artifact
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ env.ZIP_FILENAME }}
+
+  publish-msi-self-contained:
+    needs: [build, test]
+    runs-on: windows-latest
+    env:
+      RELEASE_VERSION: ${{ github.ref_name }}
+      PUBLISH_FOLDER: FluentRDP.${{ github.ref_name }}-full
+      MSI_FILENAME: FluentRDP.${{ github.ref_name }}-full.msi
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Build Self-Contained MSI
+      shell: pwsh
+      run: Build/scripts/fluentrdp.publish.msi.ps1 -version ${{ env.RELEASE_VERSION }} -runtime win-x64 -publishFolder ${{ env.PUBLISH_FOLDER }}
+    - name: Upload release artifact
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ env.MSI_FILENAME }}
+
+  publish-msi-framework-dependent:
+    needs: [build, test]
+    runs-on: windows-latest
+    env:
+      RELEASE_VERSION: ${{ github.ref_name }}
+      PUBLISH_FOLDER: FluentRDP.${{ github.ref_name }}
+      MSI_FILENAME: FluentRDP.${{ github.ref_name }}.msi
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Build Framework-Dependent MSI
+      shell: pwsh
+      run: Build/scripts/fluentrdp.publish.msi.ps1 -version ${{ env.RELEASE_VERSION }} -publishFolder ${{ env.PUBLISH_FOLDER }}
+    - name: Upload release artifact
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ env.MSI_FILENAME }}
