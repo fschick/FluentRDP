@@ -19,13 +19,14 @@ public partial class FormSettings : Form
 
     internal ApplicationSettings UpdatedSettings { get; private set; }
 
-    internal FormSettings(ApplicationSettings settings)
+    internal FormSettings(ApplicationSettings settings, Icon? icon)
     {
         ArgumentNullException.ThrowIfNull(settings);
 
         InitializeComponent();
         InitializeEnumComboBoxes();
 
+        Icon = icon;
         UpdatedSettings = settings;
         LoadConnectionSettingsToUi(UpdatedSettings.Connection);
     }
