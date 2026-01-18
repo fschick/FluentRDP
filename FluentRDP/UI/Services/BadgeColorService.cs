@@ -8,7 +8,7 @@ namespace FluentRDP.UI.Services;
 
 internal static class BadgeColorService
 {
-    private const int DEFAULT_PALETTE_SIZE = 12;
+    private const int DEFAULT_PALETTE_SIZE = 8;
 
     // App icon gradient: #94C11F -> #648A00
     private static readonly Color _iconGreenStart = ColorTranslator.FromHtml("#94C11F");

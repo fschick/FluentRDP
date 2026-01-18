@@ -345,7 +345,7 @@ public partial class FormSettings : Form
     {
         using var colorDialog = new ColorDialog();
         colorDialog.Color = panelBadgeColor.BackColor;
-        var palette = BadgeColorService.Palette.Select(color => color.R | (color.G << 8) | (color.B << 16)).ToArray();
+        var palette = BadgeColorService.Palette.OrderBy(x => x.GetHue()).Select(color => color.R | (color.G << 8) | (color.B << 16)).ToArray();
         colorDialog.CustomColors = palette;
         if (colorDialog.ShowDialog() != DialogResult.OK)
             return;
