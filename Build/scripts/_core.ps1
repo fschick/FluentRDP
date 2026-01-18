@@ -311,3 +311,37 @@ function Get-MakeAppxPath {
 
     return $makeAppxPath
 }
+
+function Sign-File {
+    param(
+        [Parameter(Mandatory=$true)][String]$FilePath,
+        [Parameter(Mandatory=$false)][String]$SignPathApiToken,
+        [Parameter(Mandatory=$false)][String]$SignPathOrganizationId,
+        [Parameter(Mandatory=$false)][String]$SignPathProjectSlug,
+        [Parameter(Mandatory=$false)][String]$SignPathPolicySlug
+    )
+    
+    if (-not (Test-Path $FilePath)) {
+        Write-Host -ForegroundColor Red "Error: File not found: $FilePath"
+        return $false
+    }
+    
+    # If SignPath credentials are provided, use SignPath CLI (if available)
+    # Otherwise, this is a placeholder for local signing with signtool
+    if ($SignPathApiToken -and $SignPathOrganizationId -and $SignPathProjectSlug -and $SignPathPolicySlug) {
+        Write-Host -ForegroundColor Yellow "Note: SignPath signing should be done via GitHub Actions workflow or SignPath CLI"
+        Write-Host -ForegroundColor Yellow "For local testing, use SignPath CLI: https://docs.signpath.io/signpath-cli/"
+        return $false
+    }
+    
+    # Check if file is already signed
+    $signature = Get-AuthenticodeSignature -FilePath $FilePath
+    if ($signature.Status -eq "Valid") {
+        Write-Host -ForegroundColor Green "File is already signed: $FilePath"
+        return $true
+    }
+    
+    Write-Host -ForegroundColor Yellow "File is not signed: $FilePath"
+    Write-Host -ForegroundColor Yellow "For code signing, use SignPath.io via GitHub Actions workflow"
+    return $false
+}

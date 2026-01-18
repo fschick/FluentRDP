@@ -1,0 +1,116 @@
+name: Build and Sign
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 1.0.0)'
+        required: false
+
+permissions:
+  contents: write
+
+env:
+  SIGNPATH_ORGANIZATION_ID: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+  SIGNPATH_PROJECT_SLUG: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+  SIGNPATH_POLICY_SLUG: ${{ secrets.SIGNPATH_POLICY_SLUG }}
+  SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ github.event.inputs.version != '' && github.event.inputs.version || github.ref_name }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Normalize version
+      id: version
+      shell: pwsh
+      run: |
+        $version = "${{ env.VERSION }}" -replace '^v', ''
+        Write-Host "Version: $version"
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+
+    - name: Build
+      shell: pwsh
+      run: Build/scripts/fluentrdp.build.ps1 -version ${{ steps.version.outputs.version }}
+
+    - name: Publish MSI
+      shell: pwsh
+      env:
+        PUBLISH_FOLDER: ${{ runner.temp }}\FluentRDP-publish
+      run: |
+        Build/scripts/fluentrdp.publish.msi.ps1 -version ${{ steps.version.outputs.version }} -runtime win-x64 -publishFolder ${{ env.PUBLISH_FOLDER }}
+        echo "MSI_PATH=${{ env.PUBLISH_FOLDER }}.msi" >> $env:GITHUB_ENV
+
+    - name: Submit signing request to SignPath
+      if: env.SIGNPATH_API_TOKEN != '' && env.SIGNPATH_ORGANIZATION_ID != '' && env.SIGNPATH_PROJECT_SLUG != '' && env.SIGNPATH_POLICY_SLUG != ''
+      uses: signpathio/submit-signing-request@v1
+      with:
+        api-token: ${{ env.SIGNPATH_API_TOKEN }}
+        organization-id: ${{ env.SIGNPATH_ORGANIZATION_ID }}
+        project-slug: ${{ env.SIGNPATH_PROJECT_SLUG }}
+        signing-policy-slug: ${{ env.SIGNPATH_POLICY_SLUG }}
+        artifact-configuration-slug: 'msi'
+        input-artifact-path: ${{ env.MSI_PATH }}
+        wait-for-completion: true
+        output-artifact-path: ${{ runner.temp }}\FluentRDP-signed.msi
+      continue-on-error: true
+
+    - name: Calculate SHA256 hash
+      id: hash
+      shell: pwsh
+      run: |
+        if (Test-Path "${{ runner.temp }}\FluentRDP-signed.msi") {
+          $msiPath = "${{ runner.temp }}\FluentRDP-signed.msi"
+        } else {
+          $msiPath = "${{ env.MSI_PATH }}"
+        }
+        $hash = (Get-FileHash -Path $msiPath -Algorithm SHA256).Hash
+        Write-Host "SHA256: $hash"
+        echo "sha256=$hash" >> $env:GITHUB_OUTPUT
+        echo "MSI_FINAL_PATH=$msiPath" >> $env:GITHUB_ENV
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ env.MSI_FINAL_PATH }}
+        name: Release ${{ steps.version.outputs.version }}
+        body: |
+          ## FluentRDP ${{ steps.version.outputs.version }}
+          
+          ### Installation
+          - **MSI Installer**: Download and run the MSI file
+          - **Silent Install**: `msiexec /i FluentRDP.${{ steps.version.outputs.version }}.msi /quiet /norestart`
+          
+          ### Checksums
+          - **SHA256**: `${{ steps.hash.outputs.sha256 }}`
+        draft: false
+        prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+
+    - name: Generate Winget Manifest
+      shell: pwsh
+      run: |
+        if (-not (Test-Path "${{ env.MSI_FINAL_PATH }}")) {
+          Write-Host "MSI file not found, skipping manifest generation"
+          exit 0
+        }
+        Build/scripts/fluentrdp.generate-winget-manifest.ps1 -version ${{ steps.version.outputs.version }} -sha256 ${{ steps.hash.outputs.sha256 }} -msiPath ${{ env.MSI_FINAL_PATH }}
+
+    - name: Upload Winget Manifest
+      uses: actions/upload-artifact@v4
+      with:
+        name: winget-manifest
+        path: WinGet/manifests/**
+        retention-days: 30
