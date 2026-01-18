@@ -1,0 +1,31 @@
+# SignPath.io Signing Policy for FluentRDP
+# This policy defines who can request signing and which artifacts can be signed
+
+name: FluentRDP Signing Policy
+description: Policy for signing FluentRDP MSI installers and binaries
+
+# Allowed signing request sources
+allowed_sources:
+  - type: github_workflow
+    repository: fschick/FluentRDP
+    workflow: build-and-sign.yml
+    branch: main
+    branch: refs/tags/v*
+
+# Artifact configurations
+artifact_configurations:
+  - slug: msi
+    name: MSI Installer
+    file_patterns:
+      - "*.msi"
+    signing_method: code_signing
+    timestamping: true
+    timestamp_server: http://timestamp.digicert.com
+
+# Approval requirements
+approval_required: true
+approvers:
+  - maintainers
+
+# Retention
+artifact_retention_days: 90
