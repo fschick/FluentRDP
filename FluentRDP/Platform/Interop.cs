@@ -51,6 +51,8 @@ internal static class Interop
     public const int HTBOTTOMLEFT = 16;
     public const int HTBOTTOMRIGHT = 17;
 
+    public const int SC_MAXIMIZE = 0xF030;
+
     // System Metrics Constants
     public const int SM_REMOTESESSION = 0x1000;
 

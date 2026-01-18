@@ -288,39 +288,49 @@ public partial class FormRdpClient : Form
 
     protected override void WndProc(ref Message m)
     {
-        var noBorderClick = m.Msg != Interop.WM_NCLBUTTONDBLCLK;
-        if (noBorderClick)
-        {
-            base.WndProc(ref m);
-            return;
-        }
-
         var shiftDown = ModifierKeys.HasFlag(Keys.Shift);
         var isFullScreen = _appSettings.Connection.ScreenMode == ScreenMode.FullScreen;
         var useAllMonitors = _appSettings.Connection.UseAllMonitors == true;
-        var noAutoResize = _appSettings.Connection.AutoResize != true;
-        switch (m.WParam.ToInt32())
+        var autoResizeIsActive = _appSettings.Connection.AutoResize == true;
+
+        switch (m.Msg)
         {
-            case Interop.HTCAPTION when shiftDown || isFullScreen || useAllMonitors:
-                ToggleFullScreen();
-                return;
-            case Interop.HTLEFT when noAutoResize:
-            case Interop.HTRIGHT when noAutoResize:
-            case Interop.HTTOP when noAutoResize:
-            case Interop.HTTOPLEFT when noAutoResize:
-            case Interop.HTTOPRIGHT when noAutoResize:
-            case Interop.HTBOTTOM when noAutoResize:
-            case Interop.HTBOTTOMLEFT when noAutoResize:
-            case Interop.HTBOTTOMRIGHT when noAutoResize:
-                if (_appSettings.Connection.Height.HasValue)
-                    BeginInvoke(() => Height = _appSettings.Connection.Height.Value + 39);
-                if (_appSettings.Connection.Width.HasValue)
-                    BeginInvoke(() => Width = _appSettings.Connection.Width.Value + 16);
-                return;
-            default:
-                base.WndProc(ref m);
+            case Interop.WM_SYSCOMMAND:
+                switch (m.WParam)
+                {
+                    case Interop.SC_MAXIMIZE when shiftDown || isFullScreen || useAllMonitors:
+                        ToggleFullScreen();
+                        break;
+                }
+                break;
+
+            case Interop.WM_NCLBUTTONDBLCLK:
+                switch (m.WParam)
+                {
+                    case Interop.HTCAPTION when shiftDown || isFullScreen || useAllMonitors:
+                        ToggleFullScreen();
+                        return;
+                    case Interop.HTLEFT:
+                    case Interop.HTRIGHT:
+                    case Interop.HTTOP:
+                    case Interop.HTTOPLEFT:
+                    case Interop.HTTOPRIGHT:
+                    case Interop.HTBOTTOM:
+                    case Interop.HTBOTTOMLEFT:
+                    case Interop.HTBOTTOMRIGHT:
+                        if (autoResizeIsActive)
+                            break;
+
+                        if (_appSettings.Connection.Height.HasValue)
+                            BeginInvoke(() => Height = _appSettings.Connection.Height.Value + 39);
+                        if (_appSettings.Connection.Width.HasValue)
+                            BeginInvoke(() => Width = _appSettings.Connection.Width.Value + 16);
+                        return;
+                }
                 break;
         }
+
+        base.WndProc(ref m);
     }
 
     /// <summary>
