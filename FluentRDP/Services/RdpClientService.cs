@@ -73,6 +73,17 @@ internal sealed class RdpClientService : IDisposable
             return;
 
         var updatedSettings = connectionSettings ?? _connectionSettings;
+
+        var noResizeRequired = updatedSettings
+            .EqualsExceptBy(
+                _connectionSettings,
+                nameof(ConnectionSettings.BadgeColor),
+                nameof(ConnectionSettings.LastConnected)
+            );
+
+        if (noResizeRequired)
+            return;
+
         var sessionCanBeUpdated = updatedSettings
             .EqualsExceptBy(
                 _connectionSettings,

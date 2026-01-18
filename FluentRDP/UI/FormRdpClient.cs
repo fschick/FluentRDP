@@ -141,7 +141,9 @@ public partial class FormRdpClient : Form
         _rdpService.FullScreen = _appSettings.Connection.ScreenMode == ScreenMode.FullScreen;
         _rdpService.Reconnect(_appSettings.Connection);
         _formSizeEnforcementService.IsActive = _appSettings.Connection.AutoResize == true;
+
         UpdateWindowTitle();
+        UpdateBadgeIcon();
 
         return true;
     }
@@ -254,7 +256,7 @@ public partial class FormRdpClient : Form
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
 
-    private void SetBadgeIcon()
+    private void UpdateBadgeIcon()
     {
         const int size = 14;
         var x = Properties.Resources.AppIcon.Size.Width - size;
@@ -357,7 +359,7 @@ public partial class FormRdpClient : Form
     private void RdpService_Connected(object? sender, EventArgs e)
     {
         HideConnectingMessage();
-        SetBadgeIcon();
+        UpdateBadgeIcon();
         _formSystemMenuService.EnableMenuItem(Interop.SC_FULLSCREEN, true);
         RecentConnectionsService.AddOrUpdate(_appSettings.Connection);
     }
