@@ -21,6 +21,7 @@ namespace FluentRDP.UI
             panelRdp = new Panel();
             lbRdp = new Label();
             panelStartup = new Panel();
+            lbRecent = new ListBox();
             lblStatusMessage = new TextBox();
             btnConnect = new Button();
             btnSettings = new Button();
@@ -55,6 +56,7 @@ namespace FluentRDP.UI
             // 
             // panelStartup
             // 
+            panelStartup.Controls.Add(lbRecent);
             panelStartup.Controls.Add(lblStatusMessage);
             panelStartup.Controls.Add(btnConnect);
             panelStartup.Controls.Add(btnSettings);
@@ -64,6 +66,17 @@ namespace FluentRDP.UI
             panelStartup.Size = new Size(964, 511);
             panelStartup.TabIndex = 1;
             // 
+            // lbRecent
+            // 
+            lbRecent.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lbRecent.BackColor = SystemColors.Control;
+            lbRecent.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lbRecent.FormattingEnabled = true;
+            lbRecent.Location = new Point(251, 12);
+            lbRecent.Name = "lbRecent";
+            lbRecent.Size = new Size(442, 229);
+            lbRecent.TabIndex = 3;
+            // 
             // lblStatusMessage
             // 
             lblStatusMessage.Anchor = AnchorStyles.None;
@@ -72,7 +85,7 @@ namespace FluentRDP.UI
             lblStatusMessage.Cursor = Cursors.IBeam;
             lblStatusMessage.Font = new Font("Segoe UI", 10F);
             lblStatusMessage.ForeColor = Color.DarkRed;
-            lblStatusMessage.Location = new Point(202, 367);
+            lblStatusMessage.Location = new Point(165, 393);
             lblStatusMessage.Multiline = true;
             lblStatusMessage.Name = "lblStatusMessage";
             lblStatusMessage.ReadOnly = true;
@@ -86,7 +99,7 @@ namespace FluentRDP.UI
             // 
             btnConnect.Anchor = AnchorStyles.None;
             btnConnect.Font = new Font("Segoe UI", 14F);
-            btnConnect.Location = new Point(382, 194);
+            btnConnect.Location = new Point(251, 275);
             btnConnect.Name = "btnConnect";
             btnConnect.Size = new Size(200, 50);
             btnConnect.TabIndex = 0;
@@ -98,7 +111,7 @@ namespace FluentRDP.UI
             // 
             btnSettings.Anchor = AnchorStyles.None;
             btnSettings.Font = new Font("Segoe UI", 14F);
-            btnSettings.Location = new Point(382, 264);
+            btnSettings.Location = new Point(493, 275);
             btnSettings.Name = "btnSettings";
             btnSettings.Size = new Size(200, 50);
             btnSettings.TabIndex = 1;
@@ -173,5 +186,6 @@ namespace FluentRDP.UI
         private Label lbConnecting;
         private Label lbRdp;
         private Button btnCancel;
+        private ListBox lbRecent;
     }
 }

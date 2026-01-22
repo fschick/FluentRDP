@@ -9,6 +9,7 @@ using FluentRDP.UI.Services;
 using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -179,6 +180,28 @@ public partial class FormRdpClient : Form
         Text = title;
     }
 
+    private void UpdateBadgeIcon()
+    {
+        const int size = 14;
+        var x = Properties.Resources.AppIcon.Size.Width - size;
+        var color = _appSettings.Connection.BadgeColor;
+        Icon = _appSettings.Connection.Hostname.GenerateBadgeIcon(x, y: 0, size, size, color);
+    }
+
+    private void UpdateRecentList()
+    {
+        var recentConnections = RecentConnectionsService.LoadAll()
+            .OrderByDescending(x => x.LastConnected)
+            .Select(recent => $"{recent.Hostname} ({recent.Width} x {recent.Height}, {recent.ScreenMode}, {recent.Username})")
+            .ToList();
+
+        lbRecent.Items.Clear();
+        foreach (var connection in recentConnections)
+        {
+            lbRecent.Items.Add(connection);
+        }
+    }
+
     private void SaveWindowSettings()
     {
         // Don't save settings if in full screen mode
@@ -254,14 +277,6 @@ public partial class FormRdpClient : Form
         }
 
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
-    }
-
-    private void UpdateBadgeIcon()
-    {
-        const int size = 14;
-        var x = Properties.Resources.AppIcon.Size.Width - size;
-        var color = _appSettings.Connection.BadgeColor;
-        Icon = _appSettings.Connection.Hostname.GenerateBadgeIcon(x, y: 0, size, size, color);
     }
 
     /// <summary>
@@ -407,6 +422,7 @@ public partial class FormRdpClient : Form
     {
         LoadAndApplyWindowSettings();
         UpdateWindowTitle();
+        UpdateRecentList();
         AutoStartup();
     }
 
