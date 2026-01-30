@@ -302,7 +302,7 @@ public partial class FormRdpClient : Form
                 {
                     case Interop.SC_MAXIMIZE when shiftDown || isFullScreen || useAllMonitors:
                         ToggleFullScreen();
-                        break;
+                        return;
                 }
                 break;
 
