@@ -225,6 +225,8 @@ function Publish-Msi([String] $project, [String] $version, [String] $framework, 
     if(!$?) {
         exit $LASTEXITCODE
     }
+	
+	Remove-Item -Path "$publishFolder" -Recurse -Force
     
     return $msiOutputPath
 }

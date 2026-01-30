@@ -9,14 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="Mono.Options" Version="6.12.0.148" />
-    <PackageReference Include="WixSharp" Version="1.26.0" />
-    <PackageReference Include="WixSharp.wix.bin" Version="3.14.1" />
+    <PackageReference Include="WixSharp_wix4" Version="2.12.1" />
+    <PackageReference Include="WixSharp_wix4.bin" Version="2.12.1" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="4.0.5" />
   </ItemGroup>
-  
-  <Target Name="SkipWixSharpBuildTarget" BeforeTargets="WixSharpBuild">
-    <PropertyGroup>
-      <WixSharpBuild>false</WixSharpBuild>
-    </PropertyGroup>
-  </Target>
 
 </Project>
