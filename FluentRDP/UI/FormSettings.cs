@@ -15,13 +15,15 @@ namespace FluentRDP.UI;
 
 public partial class FormSettings : Form
 {
+    private readonly Size _currentRdpSize;
     private static readonly List<Size> _displayResolutions = Interop.GetAvailableDisplayResolutions();
 
     internal ApplicationSettings UpdatedSettings { get; private set; }
 
-    internal FormSettings(ApplicationSettings settings, Icon? icon)
+    internal FormSettings(ApplicationSettings settings, Icon? icon, Size currentRdpSize)
     {
         ArgumentNullException.ThrowIfNull(settings);
+        _currentRdpSize = currentRdpSize;
 
         InitializeComponent();
         InitializeEnumComboBoxes();
@@ -300,7 +302,10 @@ public partial class FormSettings : Form
         var original = combobox.Text;
         var filtered = new string(original.Where(char.IsDigit).ToArray());
         if (original == filtered)
+        {
+            AdjustWidthAndHeightValues();
             return;
+        }
 
         // preserve caret position as well as possible
         var selStart = Math.Max(0, combobox.SelectionStart);
@@ -315,20 +320,19 @@ public partial class FormSettings : Form
         if (chkAutoResize.Checked)
             return;
 
-        var lowerScreenSize = GetNextLowerScreenResolution();
         if (string.IsNullOrWhiteSpace(cmbWidth.Text))
-            cmbWidth.Text = lowerScreenSize.Width.ToString();
-        if (string.IsNullOrWhiteSpace(cmbHeight.Text))
-            cmbHeight.Text = lowerScreenSize.Height.ToString();
-    }
+        {
+            cmbWidth.Text = _currentRdpSize.Width.ToString();
+            if (cmbWidth.Focused)
+                cmbWidth.SelectAll();
+        }
 
-    private static Size GetNextLowerScreenResolution()
-    {
-        var currentScreenSize = Screen.PrimaryScreen?.Bounds.Size ?? Size.Empty;
-        var lowerScreenSize = _displayResolutions.FirstOrDefault(res => res.Width < currentScreenSize.Width - 100 && res.Height < currentScreenSize.Height - 100);
-        if (lowerScreenSize.IsEmpty)
-            lowerScreenSize = _displayResolutions.Min();
-        return lowerScreenSize;
+        if (string.IsNullOrWhiteSpace(cmbHeight.Text))
+        {
+            cmbHeight.Text = _currentRdpSize.Height.ToString();
+            if (cmbHeight.Focused)
+                cmbHeight.SelectAll();
+        }
     }
 
     private void RemoveRecent(ComboBoxItem<ConnectionSettings> selectedItem)

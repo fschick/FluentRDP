@@ -131,7 +131,7 @@ public partial class FormRdpClient : Form
 
     private bool ShowSettings()
     {
-        using var settingsDialog = new FormSettings(_appSettings, Icon);
+        using var settingsDialog = new FormSettings(_appSettings, Icon, panelRdp.Size);
         var dialogConfirmed = settingsDialog.ShowDialog(this) == DialogResult.OK;
         if (!dialogConfirmed)
             return false;
@@ -141,6 +141,9 @@ public partial class FormRdpClient : Form
         _rdpService.FullScreen = _appSettings.Connection.ScreenMode == ScreenMode.FullScreen;
         _rdpService.Reconnect(_appSettings.Connection);
         _formSizeEnforcementService.IsActive = _appSettings.Connection.AutoResize == true;
+
+        if (_rdpService.IsConnected)
+            RecentConnectionsService.AddOrUpdate(_appSettings.Connection);
 
         UpdateWindowTitle();
         UpdateBadgeIcon();
