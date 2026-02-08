@@ -183,6 +183,7 @@ internal sealed class RdpClientService : IDisposable
 
         _rdpControl.OnConnected += OnConnected;
         _rdpControl.OnDisconnected += OnDisconnected;
+        _rdpControl.OnLoginComplete += OnLoginComplete;
         _rdpControl.OnConfirmClose += OnConfirmClose;
         _rdpControl.OnRequestContainerMinimize += OnRequestContainerMinimize;
         _rdpControl.OnRequestLeaveFullScreen += OnRequestLeaveFullScreen;
@@ -194,6 +195,7 @@ internal sealed class RdpClientService : IDisposable
 
         _rdpControl.OnConnected -= OnConnected;
         _rdpControl.OnDisconnected -= OnDisconnected;
+        _rdpControl.OnLoginComplete -= OnLoginComplete;
         _rdpControl.OnConfirmClose -= OnConfirmClose;
         _rdpControl.OnRequestContainerMinimize -= OnRequestContainerMinimize;
         _rdpControl.OnRequestLeaveFullScreen -= OnRequestLeaveFullScreen;
@@ -483,6 +485,9 @@ internal sealed class RdpClientService : IDisposable
         Debug.Assert(_rdpClient is not null);
         CleanupConnection((DisconnectReasonCode)e.discReason, (DisconnectReasonCodeExt)_rdpClient.ExtendedDisconnectReason, false);
     }
+
+    private void OnLoginComplete(object? sender, EventArgs e)
+        => Reconnect(_connectionSettings);
 
     private static void OnConfirmClose(object? sender, IMsTscAxEvents_OnConfirmCloseEvent e)
         => e.pfAllowClose = true;
