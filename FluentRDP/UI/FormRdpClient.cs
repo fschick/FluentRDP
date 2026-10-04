@@ -80,7 +80,7 @@ public partial class FormRdpClient : Form
             return;
 
         var autoConnectConfigured = _appSettings.NoAutoConnect != true;
-        var autoConnectSuppressed = ModifierKeys.HasFlag(Keys.Shift);
+        var autoConnectSuppressed = ModifierKeys.HasFlag(Keys.Shift) || ModifierKeys.HasFlag(Keys.Control);
         if (autoConnectConfigured && !autoConnectSuppressed)
             Connect();
     }
@@ -386,7 +386,7 @@ public partial class FormRdpClient : Form
         }
 
         var closeOnDisconnect = _appSettings.NoCloseOnDisconnect != true;
-        var closeNotSuppressed = !ModifierKeys.HasFlag(Keys.Shift);
+        var closeNotSuppressed = !(ModifierKeys.HasFlag(Keys.Shift) || ModifierKeys.HasFlag(Keys.Control));
         if (closeOnDisconnect && closeNotSuppressed && e.IsIntentionalDisconnect)
         {
             Close();
